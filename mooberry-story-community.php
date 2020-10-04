@@ -84,11 +84,11 @@ if ( !defined('MOOBERRY_STORY_COMMUNITY_ADMIN_CAP')) {
 
 
 
-require_once dirname( __FILE__ ) . '/includes/plugin-update-checker/plugin-update-checker.php';
+require_once dirname( __FILE__ ) . '/includes/vendor/plugin-update-checker/plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-	'https://github.com/christiespeich/mbm-book-shop',
+	'https://github.com/christiespeich/mooberry-story-community',
 	__FILE__,
-	'mbm-book-shop'
+	'mooberry-story-community'
 );
 
 
