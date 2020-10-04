@@ -19,6 +19,8 @@ class Mooberry_Story_Community_Taxonomy {
 
 	protected $slug;
 
+	protected $taxonomy;
+
 	protected $post_type;
 
 	protected $singular_name;
@@ -27,9 +29,11 @@ class Mooberry_Story_Community_Taxonomy {
 
 	protected $args;
 
-	public function __construct( $slug, $post_type, $singular_name = '', $plural_name = '', $args = array() ) {
+	public function __construct( $taxonomy, $slug, $post_type, $singular_name = '', $plural_name = '', $args = array() ) {
 
 		$this->slug = $slug;
+
+		$this->taxonomy = $taxonomy;
 
 		$this->post_type = $post_type;
 
@@ -38,7 +42,7 @@ class Mooberry_Story_Community_Taxonomy {
 		$this->plural_name = ( $plural_name != ''? $plural_name :  $this->singular_name );
 
 		$defaults = array(
-				'rewrite' => array(	'slug' => 'mbsc_' . $this->plural_name ),
+				'rewrite' => array(	'slug' => sanitize_text_field( $this->slug ), 'with_front' =>  false  ),
 				'public' => true,
 				'show_admin_column' => true,
 				'show_in_quick_edit'	=> 	true,
@@ -77,7 +81,7 @@ class Mooberry_Story_Community_Taxonomy {
 
 	public function register() {
 
-		register_taxonomy( $this->slug, $this->post_type, apply_filters( $this->slug . '_taxonomy', $this->args )	);
+		register_taxonomy( $this->taxonomy, $this->post_type, apply_filters( $this->taxonomy . '_taxonomy', $this->args )	);
 	}
 
 

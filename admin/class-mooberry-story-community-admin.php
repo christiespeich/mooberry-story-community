@@ -72,7 +72,17 @@ class Mooberry_Story_Community_Admin {
 	 */
 	public function enqueue_scripts() {
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/mooberry-story-community-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( 'jquery-ui-sortable' );
+
+		wp_enqueue_script( $this->plugin_name . '-admin', plugin_dir_url( __FILE__ ) . 'js/mooberry-story-community-admin.js', array(
+			'jquery',
+			'jquery-ui-dialog'
+		), $this->version, false );
+		wp_localize_script( $this->plugin_name . '-admin', 'mbdsc_admin_ajax_object', array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'mbdsc_admin_security' => wp_create_nonce( 'mbdsc_story_cpt_ajax_nonce' ),
+			'mbdsc_plugin_url'  =>  MOOBERRY_STORY_COMMUNITY_PLUGIN_URL,
+		) );
 
 	}
 
@@ -81,17 +91,11 @@ class Mooberry_Story_Community_Admin {
 	 * Hook in and register a metabox to handle a theme options page and adds a menu item.
 	 */
 	public function register_options_metabox() {
-		/**
-		 * Registers main options page menu item and form.
-		 */
-	/*	$main_settings = new Mooberry_Story_Community_Settings_Page( 'mbdsc_options_page', 'mbdsc_main_settings' );
-		$main_settings->set_menu_title( __( 'Mooberry Story Community Settings', 'mooberry-story-community' ) );
-		$main_settings->create_metabox();*/
 
 		$main_settings_page = new Mooberry_Story_Community_Main_Settings_Page();
 		$custom_fields_page = new Mooberry_Story_Community_Custom_Fields_Page();
 
-		$taxonomies = Mooberry_Story_Community_Custom_Taxonomies_Settings::get_taxonomies();
+		//$taxonomies = Mooberry_Story_Community_Custom_Taxonomies_Settings::get_taxonomies();
 	}
 
 }

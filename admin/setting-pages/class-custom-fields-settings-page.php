@@ -17,81 +17,124 @@ class Mooberry_Story_Community_Custom_Fields_Page extends Mooberry_Story_Communi
 	 */
 	public function __construct() {
 
-parent::__construct( 'mbdsc_custom_fields_metabox', 'mbdsc_custom_fields_options', $this->tab_group, 'Custom Fields' );
+		$this->tab_group = 'mbdsc_custom_fields';
 
+		parent::__construct( 'mbdsc_custom_fields_metabox', 'mbdsc_custom_fields_options', $this->tab_group, 'Custom Fields' );
 
 
 		$this->set_parent_slug( 'mbdsc_main_settings' );
 		$this->set_title( __( 'Custom Fields', 'mooberry-story-community' ) );
 		$this->set_menu_title( __( 'Custom Fields', 'mooberry-story-community' ) );
 
-$this->create_metabox();
-$this->add_fields();
+		$this->create_metabox();
+		$this->add_fields();
 
-		$this->add_tab( new Mooberry_Story_Community_Taxonomy_Fields_Tab( $this) );
+		$this->add_tab( new Mooberry_Story_Community_Taxonomy_Fields_Tab( $this ) );
 
-		add_action( 'update_option_mbds_options', array( $this, 'options_updated' ), 10, 2 );
-		//add_filter( 'mbds_settings_metabox', array( $this, 'set_up_metabox' ) );
+		$custom_fields = Mooberry_Story_Community_Custom_Fields_Settings::get_custom_fields();
+			foreach ( $custom_fields as $field ) {
+			if ( $field->has_options ) {
+				$this->add_tab( new Mooberry_Story_Community_Custom_Field_Options_Tab( $this, $field->unique_id, $field->name));
+
+			}
+		}
+
 
 	}
 
 
-	function add_fields(  ) {
+	function add_fields() {
 
-
-
-
-		$this->add_field( array(
+		$mbdb_settings_metabox = $this->metabox;
+		$mbdb_settings_metabox->add_field( array(
 				'id'      => 'custom_fields',
 				'type'    => 'group',
-
+				'desc'    => __( 'Create your custom fields for stories here. If you would like to create a field to organize stories, such as genre, click on the Taxonomy Fields tab.', 'mooberry-story-community' ) ,
 				'options' => array(
-					'group_title'   => __( 'Taxonomy Field', 'mooberry-story-premium' ) . ' {#}',
+					'group_title'   => __( 'Field', 'mooberry-story-community' ) . ' {#}',
 					// since version 1.1.4, {#} gets replaced by row number
-					'add_button'    => __( 'Add New Taxonomy Field', 'mooberry-story-premium' ),
-					'remove_button' => __( 'Remove Taxonomy Field', 'mooberry-story-premium' ),
-					'sortable'      => false,
+					'add_button'    => __( 'Add New Field', 'mooberry-story-community' ),
+					'remove_button' => __( 'Remove Field', 'mooberry-story-community' ),
+					'sortable'      => true,
 					// beta
 				),
 			)
 		);
 
-
-
-		$this->add_group_field( 'custom_fields', array(
-				'name'       => __( 'Display this field on the Table of Contents Page?', 'mooberry-story-premium' ),
-				'id'         => 'display_toc',
-				'type'       => 'select',
-				'options'    => array(
-					'yes' => __( 'Yes', 'mooberry-story-premium' ),
-					'no'  => __( 'No', 'mooberry-story-premium' ),
-				),
+		$mbdb_settings_metabox->add_group_field( 'custom_fields', array(
+				'name'       => __( 'Field', 'mooberry-story-community' ),
+				'id'         => 'name',
+				'type'       => 'text_medium',
 				'attributes' => array(
 					'required' => 'required',
 				),
 			)
 		);
 
-		global $wp_roles;
-		$user_roles = $wp_roles->get_names();
-		if ( ! is_array( $user_roles ) ) {
-			$user_roles = array( $user_roles );
-		}
+		$mbdb_settings_metabox->add_group_field( 'custom_fields', array(
+				'name' => __( 'Description', 'mooberry-story-community' ),
+				'id'   => 'description',
+				'type' => 'text',
+				'desc' => __( 'This text is an example of a description and how it will appear.', 'mooberry-story-community' ),
+			)
+		);
 
-		$this->add_group_field( 'custom_fields', array(
-				'name'       => __( 'Allow these user roles to add new items to this taxonomy', 'mooberry-story-premium' ),
-				'id'         => 'roles_can_add',
-				'type'       => 'multicheck',
-				'options'    => $user_roles,
-				'attributes' => array(
-					'required' => 'required',
+		$mbdb_settings_metabox->add_group_field( 'custom_fields', array(
+				'name'    => __( 'Type', 'mooberry-story-community' ),
+				'id'      => 'type',
+				'type'    => 'select',
+				'desc'    => __( 'For fields of type Drop Down, Radio, or Checkbox, you\'ll be able to set the options on a new tab after you have saved the fields.', 'mooberry-story-community' ),
+				'options' => array(
+					'text'       => 'Text Box',
+					'multicheck' => 'Checkbox',
+					'radio'      => 'Radio Button',
+					'select'     => 'Drop Down',
+					'checkbox'   => 'Yes/No Toggle',
+				),
+
+			)
+		);
+/*
+
+		$mbdb_settings_metabox->add_group_field( 'custom_fields', array(
+				'name' => __( 'Is this field for stories or chapters?', 'mooberry-story-community' ),
+				'id'   => 'story_or_chapter',
+				'type' => 'select',
+				'options'   =>  array('story'=>__('Story', 'mooberry-story-community'),'chapter'=>__('Chapter', 'mooberry-story-community')),
+
+			)
+		);*/
+
+
+		$mbdb_settings_metabox->add_group_field( 'custom_fields', array(
+				'name' => __( 'Disable Field', 'mooberry-story-community' ),
+				'id'   => 'disabled',
+				'type' => 'checkbox',
+				'desc' => __( 'Fields that are disabled are not shown when editing/adding a book nor when displaying the book page.  By disabling a field instead of deleting it, the information assigned to that field will not be erased.', 'mooberry-story-community' )
+			)
+		);
+
+/*		$mbdb_settings_metabox->add_group_field( 'custom_fields', array(
+				'name' => __( 'Hide Field', 'mooberry-story-community' ),
+				'id'   => 'hidden',
+				'type' => 'checkbox',
+				'desc' => __( 'Fields that may contain spoiler information (such as whether the ending is "happy-ever-after" or not) can be hidden. The user will then have to click a link to display the information.', 'mooberry-story-community'
+				)
+			)
+		);*/
+
+
+		$mbdb_settings_metabox->add_group_field( 'custom_fields', array(
+				'id'              => 'uniqueID',
+				'type'            => 'text',
+				'show_names'      => false,
+				'sanitization_cb' => array( $this, 'get_uniqueID' ),
+				'attributes'      => array(
+					'type' => 'hidden',
 				),
 			)
 		);
 
-
-		//return apply_filters( 'mbds_settings_core_metabox', $mbds_settings_metabox, $this->page, $this->tab );
-		//return $mbds_settings_metabox;
 
 	}
 
@@ -110,8 +153,6 @@ $this->add_fields();
 
 
 	}
-
-
 
 
 	/**
@@ -141,7 +182,7 @@ $this->add_fields();
 	 * @since  0.1.0
 	 */
 	public function __get( $field ) {
-		return parent::__get($field);
+		return parent::__get( $field );
 		// Allowed fields to retrieve
 		if ( in_array( $field, array( 'key', 'metabox_id', 'title', 'options_page' ), true ) ) {
 			return $this->{$field};
@@ -150,37 +191,14 @@ $this->add_fields();
 		throw new Exception( 'Invalid property: ' . $field );
 	}
 
-	/**
-	 *
-	 *  Register all taxonomies
-	 *  Flush rewrite rules
-	 *  This function runs if ANY of the fields were updated.
-	 *
-	 *
-	 * @param  [string] $old_value
-	 * @param  [string] $new_value
-	 *
-	 * @access public
-	 * @since  3.0
-	 */
-	public function options_updated( $old_value, $new_value ) {
+	function get_uniqueID( $value ) {
 
-
-		if ( array_key_exists( 'taxonomies', $new_value ) ) {
-			MBDSC()->register_taxonomies( $new_value['taxonomies'] );
-			$single = isset( $new_value['singular_name'] ) ? sanitize_text_field( $new_value['singular_name'] ) : '';
-			$tax    = 'mbdb_' . sanitize_title( $single );
-
-			// if any don't have slugs set, do it now
-			if ( in_array( $single, mbds_wp_reserved_terms() ) ) {
-				$single = 'book-' . $single;
-			}
-
+		usleep( 3 );
+		if ( $value == '' ) {
+			$value = uniqid();
 		}
-		flush_rewrite_rules();
-		global $wp_rewrite;
-		$wp_rewrite->flush_rules();
 
+		return $value;
 
 	}
 

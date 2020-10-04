@@ -14,7 +14,7 @@ class Mooberry_Story_Community_Settings_Page {
 		$this->metabox_id = $metabox_id;
 		$this->option_key = $option_key;
 
-		//add_action( "cmb2_save_options-page_fields_{$this->metabox_id}", array( $this, 'settings_notices' ), 10, 2 );
+		add_action( "cmb2_save_options-page_fields_{$this->metabox_id}", array( $this, 'settings_notices' ), 10, 2 );
 	}
 
 	public function set_title( $value ) {

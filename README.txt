@@ -14,6 +14,7 @@ Here is a short description of the plugin.  This should be no more than 150 char
 
 
 		Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
+		
 
 
 This is the long description.  No limit, and you can use Markdown (as well as in the following sections).

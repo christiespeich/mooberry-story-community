@@ -117,21 +117,33 @@ class Mooberry_Story_Community {
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'admin/setting-pages/class-settings-tab.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'admin/setting-pages/class-main-settings-page.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'admin/setting-pages/class-custom-fields-settings-page.php';
-		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'admin/setting-pages/class-custom-fields-tab.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'admin/setting-pages/class-custom-field-options-tab.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'admin/setting-pages/class-taxonomy-fields-tab.php';
 
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/settings/class-settings.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/settings/class-main-settings.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/settings/class-custom-field.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/settings/class-custom-field-option.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/settings/class-custom-fields-settings.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/settings/class-custom-taxonomy.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/settings/class-custom-taxonomies-settings.php';
+
 
 
 		// CPTs
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/class-custom-post-types.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/class-post-object.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-story-cpt.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter-cpt.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/class-taxonomy.php';
 
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-story.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-story-collection.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter-collection.php';
+
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-updated-stories-widget.php';
+        require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-taxonomy-widget.php';
 	}
 
 	/**
@@ -183,7 +195,25 @@ class Mooberry_Story_Community {
 		add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_scripts' ) );
 
+		// shortcodes
+		add_shortcode( 'mbdsc_cover', array( $plugin_public, 'shortcode_cover' ) );
+		add_shortcode( 'mbdsc_summary', array( $plugin_public, 'shortcode_summary' ) );
+		add_shortcode( 'mbdsc_complete', array( $plugin_public, 'shortcode_complete' ) );
+		add_shortcode( 'mbdsc_custom_field_story', array( $plugin_public, 'shortcode_custom_field_story' ) );
+		add_shortcode( 'mbdsc_custom_field_chapter', array( $plugin_public, 'shortcode_custom_field_chapter' ) );
+		add_shortcode( 'mbdsc_taxonomy_field', array( $plugin_public, 'shortcode_taxonomy_field' ) );
+		add_shortcode( 'mbdsc_toc', array( $plugin_public, 'shortcode_toc' ) );
+		add_shortcode( 'mbdsc_toc_link', array( $plugin_public, 'shortcode_toc_link' ) );
+		add_shortcode( 'mbdsc_prev', array( $plugin_public, 'shortcode_prev' ) );
+		add_shortcode( 'mbdsc_next', array( $plugin_public, 'shortcode_next' ) );
+
+
+
+
+
 	}
+
+
 
 	private function register_cpts() {
 		$story = new Mooberry_Story_Community_Story_CPT();

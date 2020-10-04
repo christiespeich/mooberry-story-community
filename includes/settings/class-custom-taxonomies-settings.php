@@ -8,7 +8,14 @@ class Mooberry_Story_Community_Custom_Taxonomies_Settings {
 	}
 
 	public static function get_taxonomies() {
-		return self::get('taxonomies', array());
+		$taxonomy_options = self::get('taxonomies', array());
+		$taxonomies = array();
+		if ( is_array( $taxonomy_options ) ) {
+			foreach ( $taxonomy_options as $taxonomy ) {
+				$taxonomies[] = new Mooberry_Story_Community_Custom_Taxonomy($taxonomy);
+			}
+		}
+		return $taxonomies;
 	}
 
 }

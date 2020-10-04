@@ -32,9 +32,9 @@ class Mooberry_Story_Community_Deactivator {
 	public static function deactivate() {
 
 		remove_role(MOOBERRY_STORY_COMMUNITY_ROLE_ADMIN);
-		remove_role(MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR);
+		//remove_role(MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR);
 		remove_role(MOOBERRY_STORY_COMMUNITY_ROLE_AUTHOR);
-		remove_role(MOOBERRY_STORY_COMMUNITY_ROLE_MODERATED_AUTHOR);
+		//remove_role(MOOBERRY_STORY_COMMUNITY_ROLE_MODERATED_AUTHOR);
 		remove_role(MOOBERRY_STORY_COMMUNITY_ROLE_READER);
 
 	}

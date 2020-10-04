@@ -37,33 +37,39 @@ class Mooberry_Story_Community_Activator {
 		$admin_role->add_cap( MOOBERRY_STORY_COMMUNITY_ADMIN_CAP );
 		get_role( 'administrator' )->add_cap( MOOBERRY_STORY_COMMUNITY_ADMIN_CAP );
 
-		remove_role( MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR );
-		add_role( MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR, 'MB Story Community ' . __( 'Moderator', 'mooberry-story-community' ) );
+		/*remove_role( MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR );
+		add_role( MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR, 'MB Story Community ' . __( 'Moderator', 'mooberry-story-community' ) );*/
 
 		remove_role( MOOBERRY_STORY_COMMUNITY_ROLE_AUTHOR );
 		add_role( MOOBERRY_STORY_COMMUNITY_ROLE_AUTHOR, 'MB Story Community ' . __( 'Author', 'mooberry-story-community' ) );
 
-		remove_role( MOOBERRY_STORY_COMMUNITY_ROLE_MODERATED_AUTHOR );
-		add_role( MOOBERRY_STORY_COMMUNITY_ROLE_MODERATED_AUTHOR, 'MB Story Community ' . __( 'Moderated Author', 'mooberry-story-community' ) );
+/*		remove_role( MOOBERRY_STORY_COMMUNITY_ROLE_MODERATED_AUTHOR );
+		add_role( MOOBERRY_STORY_COMMUNITY_ROLE_MODERATED_AUTHOR, 'MB Story Community ' . __( 'Moderated Author', 'mooberry-story-community' ) );*/
 
 		remove_role( MOOBERRY_STORY_COMMUNITY_ROLE_READER );
 		add_role( MOOBERRY_STORY_COMMUNITY_ROLE_READER, 'MB Story Community ' . __( 'Reader', 'mooberry-story-community' ) );
 
-		// TODO: only on first activation
-		$custom_taxonomies = array(
-			array(
-				'display_toc'   => 'yes',
-				'plural_name'   => 'New Genres',
-				'singular_name' => 'Genre',
-				'roles_can_add' => array(
-					'administrator',
-					MOOBERRY_STORY_COMMUNITY_ROLE_ADMIN,
-					MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR,
-				),
-			),
-		);
-		Mooberry_Story_Community_Settings::update( 'mbdsc_taxonomy_fields_options', array( 'taxonomies' => $custom_taxonomies ) );
 
+		$has_been_installed = get_option('mbdsc_has_been_installed', false );
+		if ( ! $has_been_installed ) {
+			$custom_taxonomies = array(
+				array(
+					'display_toc'   => 'yes',
+					'plural_name'   => __( 'Genres', 'mooberry-story-community' ),
+					'singular_name' => __( 'Genre', 'mooberry-story-community' ),
+					'slug'          => 'genre',
+					'hierarchical'  => 'yes',
+					'multiple'      => 'no',
+					'required'      => 'yes',
+					'roles_can_add' => array(
+						'administrator',
+						MOOBERRY_STORY_COMMUNITY_ROLE_ADMIN,
+					//	MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR,
+					),
+				),
+			);
+			Mooberry_Story_Community_Settings::update( 'mbdsc_taxonomy_fields_options', array( 'taxonomies' => $custom_taxonomies ) );
+		}
 
 		$story_cpt   = new Mooberry_Story_Community_Story_CPT();
 		$chapter_cpt = new Mooberry_Story_Community_Chapter_CPT();
@@ -72,32 +78,11 @@ class Mooberry_Story_Community_Activator {
 			$cpt->register();
 			$cpt->set_up_roles();
 		}
-
-
-
 		flush_rewrite_rules();
 
+		update_option('mbdsc_has_been_installed', true);
+
 
 	}
 
-}
-
-
-function mbdsc_register_taxonomies( $taxonomies, $cpt ) {
-	foreach ( $taxonomies as $taxonomy ) {
-		$single = isset( $taxonomy['singular_name'] ) ? sanitize_text_field( $taxonomy['singular_name'] ) : '';
-		$plural = isset( $taxonomy['plural_name'] ) ? sanitize_text_field( $taxonomy['plural_name'] ) : '';
-		$tax    = 'mbdb_' . sanitize_title( $single );
-
-		$cpt->add_taxonomy( new Mooberry_Story_Community_Taxonomy( $tax, 'mbdb_book', $single, $plural, array(
-			'meta_box_cb'  => 'post_categories_meta_box',
-			'capabilities' => array(
-				'manage_terms' => 'manage_genre_terms', //'manage_categories',
-				'edit_terms'   => 'manage_genre_terms', //'manage_categories',
-				'delete_terms' => 'manage_genre_terms',
-				'assign_terms' => 'assign_genre_terms',
-			),
-		) ) );
-
-	}
 }

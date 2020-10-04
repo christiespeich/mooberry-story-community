@@ -36,7 +36,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Rename this for your plugin and update it as you release new versions.
  */
 if ( !defined('MOOBERRY_STORY_COMMUNITY_VERSION')) {
-	define( 'MOOBERRY_STORY_COMMUNITY_VERSION', '1.0.0' );
+	define( 'MOOBERRY_STORY_COMMUNITY_VERSION', '0.1' );
 }
 
 if ( !defined('MOOBERRY_STORY_COMMUNITY_PLUGIN_VERSION_KEY')) {
@@ -61,17 +61,17 @@ if ( !defined('MOOBERRY_STORY_COMMUNITY_ROLE_ADMIN')) {
 	define( 'MOOBERRY_STORY_COMMUNITY_ROLE_ADMIN', 'mbdsc_admin' );
 }
 
-if ( !defined('MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR')) {
+/*if ( !defined('MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR')) {
 	define( 'MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR', 'mbdsc_moderator' );
-}
+}*/
 
 if ( !defined('MOOBERRY_STORY_COMMUNITY_ROLE_AUTHOR')) {
 	define( 'MOOBERRY_STORY_COMMUNITY_ROLE_AUTHOR', 'mbdsc_author' );
 }
 
-if ( !defined('MOOBERRY_STORY_COMMUNITY_ROLE_MODERATED_AUTHOR')) {
+/*if ( !defined('MOOBERRY_STORY_COMMUNITY_ROLE_MODERATED_AUTHOR')) {
 	define( 'MOOBERRY_STORY_COMMUNITY_ROLE_MODERATED_AUTHOR', 'mbdsc_moderated_author' );
-}
+}*/
 
 if ( !defined('MOOBERRY_STORY_COMMUNITY_ROLE_READER')) {
 	define( 'MOOBERRY_STORY_COMMUNITY_ROLE_READER', 'mbdsc_reader' );
@@ -80,6 +80,16 @@ if ( !defined('MOOBERRY_STORY_COMMUNITY_ROLE_READER')) {
 if ( !defined('MOOBERRY_STORY_COMMUNITY_ADMIN_CAP')) {
 	define( 'MOOBERRY_STORY_COMMUNITY_ADMIN_CAP', 'mbdsc_manage_options' );
 }
+
+
+
+
+require_once dirname( __FILE__ ) . '/includes/plugin-update-checker/plugin-update-checker.php';
+$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+	'https://github.com/christiespeich/mbm-book-shop',
+	__FILE__,
+	'mbm-book-shop'
+);
 
 
 
@@ -103,6 +113,13 @@ function deactivate_mooberry_story_community() {
 
 register_activation_hook( __FILE__, 'activate_mooberry_story_community' );
 register_deactivation_hook( __FILE__, 'deactivate_mooberry_story_community' );
+
+add_action( 'widgets_init', 'mbdsc_register_widgets' ); // function to load my widget
+function mbdsc_register_widgets() {
+	register_widget( 'Mooberry_Story_Community_Updated_Stories_Widget' );
+	register_widget( 'Moobery_Story_Community_Taxonomy_Widget' );
+
+}
 
 /**
  * The core plugin class that is used to define internationalization,

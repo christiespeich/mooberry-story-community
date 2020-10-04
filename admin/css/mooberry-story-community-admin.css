@@ -2,3 +2,54 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+/* reduce cover size in Stories list */
+.post-type-mbdsc_story .wp-list-table .cmb-type-file img {
+    max-height: 100px;
+    width: auto;
+}
+
+/* no close (X) button on dialog */
+.no-close .ui-dialog-titlebar-close {
+  display: none;
+}
+
+
+#mbdsc_chapter_list li span {
+    position: absolute;
+    margin-left: -1.3em;
+}
+#mbdsc_chapter_list li {
+     margin: 0 2em 1em 0;
+    padding: 0.4em;
+    padding-left: 1.5em;
+    font-size: 1.4em;
+    height: 2em;
+    cursor: pointer;
+    cursor: hand;
+}
+.mbdsc_chapter_list_edit {
+    height: 1.2em;
+    float: right;
+    opacity: 75%;
+    margin-top: 0.4em;
+    cursor: pointer;
+    cursor: hand;
+}
+.mbdsc_chapter_title {
+    display:inline;
+}
+.mbdsc_chapter_preview_icon {
+    height: 1em;
+    margin-left: 1em;
+    opacity: 75%;
+    cursor: pointer;
+    cursor: hand;
+}
+.mbdsc_chapter_delete_icon {
+    height: 2em;
+    float: right;
+    margin-top: 1em;
+    cursor: pointer;
+    cursor: hand;
+}

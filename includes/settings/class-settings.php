@@ -11,9 +11,9 @@ class Mooberry_Story_Community_Settings {
 	protected static $options;
 
 	public static function get( $setting_page, $field, $default = '' ) {
-		if ( ! is_array( self::$options ) || ! array_key_exists( $setting_page, self::$options ) ) {
+	//	if ( ! is_array( self::$options ) || ! array_key_exists( $setting_page, self::$options ) ) {
 			self::load( $setting_page );
-		}
+	//  	}
 		if ( array_key_exists( $setting_page, self::$options ) ) {
 			if ( array_key_exists( $field, self::$options[ $setting_page ] ) ) {
 				return self::$options[ $setting_page ][ $field ];

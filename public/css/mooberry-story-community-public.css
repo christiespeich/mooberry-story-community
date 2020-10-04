@@ -2,3 +2,79 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+
+
+
+/* Story Page */
+.mbdsc_cover_image {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    max-height: 350px;
+}
+
+.mbdsc_story_complete_label, .mbdsc_story_custom_field_label, .mbdsc_story_taxonomy_label {
+    font-weight: bold;
+}
+
+.entry-content ol.mbdsc_toc_list li {
+    line-height: 2.5em;
+}
+
+
+/* Chapter Page */
+.mbdsc_toc_link {
+    width: 20%;
+    margin: 0 5%;
+}
+
+.mbdsc_previous {
+    float: left;
+    text-align: left;
+}
+
+.mbdsc_next {
+    float: right;
+    text-align: right;
+}
+
+.mbdsc_next, .mbdsc_previous {
+    width: 35%;
+}
+
+.mbdsc_chapter_text {
+    margin: 3em 0;
+}
+
+
+/* Story archive and taxonomy archives of stories */
+.post-type-archive-mbdsc_story img.mbdsc_cover_image, .archive article.mbdsc_story img.mbdsc_cover_image {
+    float: left;
+    margin-right: 5em;
+}
+
+
+
+/* Taxonomy Widget */
+ul.mbdsc_taxonomy_menu_not_expandable, ul.mbdsc_taxonomy_menu_not_expandable ul {
+    list-style: none;
+}
+
+ul.mbdsc_taxonomy_menu li {
+    list-style-type: none;
+}
+ul.mbdsc_taxonomy_menu ul.children  {
+    display: none;
+}
+
+ul.mbdsc_taxonomy_menu span.mbdsc_taxonomy_menu_leaf, ul.mbdsc_taxonomy_menu span.mbdsc_taxonomy_menu_toggle {
+    padding-right: 5px;
+}
+
+ul.mbdsc_taxonomy_menu span.mbdsc_taxonomy_menu_toggle {
+    cursor: pointer;
+}
+
+ul.mbdsc_taxonomy_menu ul.children {
+    margin-left: 1.5em;
+}

@@ -64,7 +64,9 @@
 	function get_tabs( $cmb_options ) {
 		$tab_group = $cmb_options->cmb->prop( 'tab_group' );
 		$tabs      = array();
+		$boxes = CMB2_Boxes::get_all();
 		foreach ( CMB2_Boxes::get_all() as $cmb_id => $cmb ) {
+			$cmb_tab_group = $cmb->prop( 'tab_group' );
 			if ( $tab_group === $cmb->prop( 'tab_group' ) ) {
 				$tabs[ $cmb->options_page_keys()[0] ] = $cmb->prop( 'tab_title' )
 					? $cmb->prop( 'tab_title' )
