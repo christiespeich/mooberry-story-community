@@ -5,6 +5,7 @@ jQuery(document)
 	  // for the checkbox group. HTML5 validation requires all checkboxes to be checked
 	  jQuery('#mbdsc_taxonomy_fields_metabox input[name="submit-cmb"]')
 		.on('click', mbdsc_validate_checkboxes)
+	  jQuery('.post-type-mbdsc_story #publish').on('click', mbdsc_validate_checkboxes);
 	  jQuery('.post-type-mbdsc_story input[name="save"]')
 		.on('click', mbdsc_save_story)
 
