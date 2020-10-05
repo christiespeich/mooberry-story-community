@@ -4,7 +4,7 @@
 class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 
 	public function __construct() {
-		parent::__construct('mbdsc_story');
+		parent::__construct( 'mbdsc_story' );
 
 		$this->plural_name   = 'Stories';
 		$this->singular_name = 'Story';
@@ -24,7 +24,10 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 					'assign_terms' => 'assign_' . $custom_taxonomy->taxonomy . '_terms',
 				),
 				'hierarchical' => $custom_taxonomy->is_hierarchical,
-				'rewrite'   =>  array( 'slug' => strtolower(sanitize_text_field( $this->plural_name) ). '/' . $custom_taxonomy->slug, 'with_front' => false, 'hierarchical' => $custom_taxonomy->is_hierarchical )
+				'rewrite'      => array( 'slug'         => strtolower( sanitize_text_field( $this->plural_name ) ) . '/' . $custom_taxonomy->slug,
+				                         'with_front'   => false,
+				                         'hierarchical' => $custom_taxonomy->is_hierarchical
+				)
 
 			) );
 			$this->add_taxonomy( $new_taxonomy );
@@ -37,7 +40,7 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 			'supports'        => array( 'title', 'author' ),
 			'taxonomies'      => array_keys( $this->taxonomies ),
 			'capability_type' => array( $this->single, $this->plural ),
-			'has_archive'   =>  true,
+			'has_archive'     => true,
 
 
 		);
@@ -46,11 +49,10 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 		$this->set_up_role_levels();
 		add_action( 'add_meta_boxes_mbdsc_story', array( $this, 'mbds_add_posts_meta_box' ) );
 		add_action( 'wp_ajax_save_chapters_order', array( $this, 'save_chapters_order' ) );
-add_action( 'wp_ajax_save_chapter', array( $this, 'save_chapter') );
-add_action( 'wp_ajax_get_chapter', array( $this, 'get_chapter') );
-add_action( 'wp_ajax_mbdsc_delete_chapter', array( $this, 'delete_chapter') );
+		add_action( 'wp_ajax_save_chapter', array( $this, 'save_chapter' ) );
+		add_action( 'wp_ajax_get_chapter', array( $this, 'get_chapter' ) );
+		add_action( 'wp_ajax_mbdsc_delete_chapter', array( $this, 'delete_chapter' ) );
 		add_filter( 'the_content', array( $this, 'content' ) );
-
 
 
 	}
