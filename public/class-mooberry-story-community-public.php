@@ -236,7 +236,7 @@ class Mooberry_Story_Community_Public {
 		if ( $story && $atts['tax'] != '' ) {
 			$taxonomy = isset( $story->taxonomies[ $atts['tax'] ] ) ? $story->taxonomies[ $atts['tax'] ] : null;
 			$content  = '<div class="mbdsc_story_taxonomy mbdsc_story_taxonomy_' . $taxonomy->taxonomy . '">';
-			$content  .= '<span class="mbdsc_story_taxonomy_label mbdsc_story_taxonomy_' . $taxonomy->taxonomy . '_label">' . $taxonomy->name . ':</span> <span class="mbdsc_story_taxonomy_value mbdsc_story_taxonomy_' . $taxonomy->taxonomy . '_value">' . get_the_term_list( $story->id, $taxonomy->taxonomy ) . '</span>';
+			$content  .= '<span class="mbdsc_story_taxonomy_label mbdsc_story_taxonomy_' . $taxonomy->taxonomy . '_label">' . $taxonomy->name . ':</span> <span class="mbdsc_story_taxonomy_value mbdsc_story_taxonomy_' . $taxonomy->taxonomy . '_value">' . get_the_term_list( $story->id, $taxonomy->taxonomy, '', ', ' ) . '</span>';
 			$content  .= '</div>';
 		}
 
