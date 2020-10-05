@@ -18,6 +18,8 @@ class Mooberry_Story_Community_Main_Settings_Page  extends Mooberry_Story_Commun
 	}
 
 	protected function add_tabs() {
+
+
 	/*	$photo_tab   = new Mooberry_Directory_Photo_Settings_Page( $this );
 		$email_tab   = new Mooberry_Directory_Email_Settings_Page( $this );
 		$renewal_tab = new Mooberry_Directory_Renewal_Settings_Page( $this );
@@ -33,6 +35,14 @@ class Mooberry_Story_Community_Main_Settings_Page  extends Mooberry_Story_Commun
 	}
 
 	protected function add_fields_on_first_tab() {
+		$this->add_field( array(
+				'id'      => 'mbdsc_coming_soon',
+				'type'    => 'title',
+
+				'name'  =>  'COMING SOON'
+			)
+		);
+
 
 	}
 }

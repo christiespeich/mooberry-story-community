@@ -60,7 +60,7 @@ class Mooberry_Story_Community_Activator {
 					'slug'          => 'genre',
 					'hierarchical'  => 'yes',
 					'multiple'      => 'no',
-					'required'      => 'yes',
+					'required'      => 'no',
 					'roles_can_add' => array(
 						'administrator',
 						MOOBERRY_STORY_COMMUNITY_ROLE_ADMIN,
