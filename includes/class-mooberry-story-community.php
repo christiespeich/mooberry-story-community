@@ -67,6 +67,7 @@ class Mooberry_Story_Community {
 
 		$this->load_dependencies();
 		$this->set_locale();
+		$this->perform_updates();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 		$this->register_cpts();
@@ -160,6 +161,24 @@ class Mooberry_Story_Community {
 		$plugin_i18n = new Mooberry_Story_Community_i18n();
 
 		add_action( 'plugins_loaded', array( $plugin_i18n, 'load_plugin_textdomain' ) );
+
+	}
+
+	/**
+	 * Runs any updates needed.
+	 *
+	 * Uses the Mooberry_Story_Community_Updates class in order to check for and run updates
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function perform_updates() {
+
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/class-updates.php';
+
+		$plugin_updates = new Mooberry_Story_Community_Updates( $this->version );
+
+		add_action( 'init', array( $plugin_updates, 'check_for_updates' ), 99 );
 
 	}
 
