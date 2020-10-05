@@ -4,7 +4,7 @@ Donate link: http://www.mooberrydreams.com
 Tags: comments, spam
 Requires at least: 3.8.0
 Tested up to: 5.5
-Stable tag: 0.1
+Stable tag: 0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,11 @@ you put the stable version, in order to eliminate any doubt.
 == Screenshots ==
 
 == Changelog ==
+
+=0.2 =
+* Comma-separate taxonomies on story page
+* fix checkbox validation issue for taxonomies
+* add update handling
 
 = 0.1 =
 * Initial Version
