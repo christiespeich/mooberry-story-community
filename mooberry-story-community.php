@@ -4,7 +4,7 @@
  * Plugin Name:       Mooberry Story Community
  * Plugin URI:        http://www.mooberrydreams.com/
  * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
- * Version:           0.2
+ * Version:           0.3
  * Author:            Mooberry Dreams
  * Author URI:        http://www.mooberrydreams.com
  * License:           GPL-2.0+
@@ -22,7 +22,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Currently plugin version.
  */
 if ( !defined('MOOBERRY_STORY_COMMUNITY_VERSION')) {
-	define( 'MOOBERRY_STORY_COMMUNITY_VERSION', '0.2' );
+	define( 'MOOBERRY_STORY_COMMUNITY_VERSION', '0.3' );
 }
 
 if ( !defined('MOOBERRY_STORY_COMMUNITY_PLUGIN_VERSION_KEY')) {

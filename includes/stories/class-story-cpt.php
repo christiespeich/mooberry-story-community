@@ -268,38 +268,41 @@ function save_chapter() {
 			return $content;
 		}
 
-		if (  is_archive() ) {
+		if ( is_archive() ) {
 			return $this->get_archive_content( $content );
 		}
 
 
-
 		// if it's a story page, show the TOC
 		if ( is_single() && ! is_admin() ) {
-global $post;
+			global $post;
 
 			$slug = $post->post_name;
 
-			$content = '[mbdsc_cover story="' . $slug . '"]';
+			$content =  '[mbdsc_author story="' . $slug . '" byline="yes"]';
+
+			$content .= '[mbdsc_cover story="' . $slug . '"]';
 
 			$content .= '[mbdsc_summary story="' . $slug . '"]';
 
-			$content .= '[mbdsc_complete story="' . $slug .'"]';
+			$content .= '[mbdsc_story_word_count story="' . $slug . '"]';
+
+			$content .= '[mbdsc_complete story="' . $slug . '"]';
 
 			$custom_fields = Mooberry_Story_Community_Custom_Fields_Settings::get_custom_story_fields();
 			foreach ( $custom_fields as $custom_field ) {
-			    $content .= '[mbdsc_custom_field_story story="' . $slug . '" field="' . $custom_field->unique_id  . '"]';
-            }
+				$content .= '[mbdsc_custom_field_story story="' . $slug . '" field="' . $custom_field->unique_id . '"]';
+			}
 
 			$taxonomies = Mooberry_Story_Community_Custom_Taxonomies_Settings::get_taxonomies();
 			foreach ( $taxonomies as $taxonomy ) {
-			    if ( $taxonomy->display_toc) {
-				    $content .= '[mbdsc_taxonomy_field story="' . $slug . '" tax="' . $taxonomy->slug . '"]';
-			    }
-            }
+				if ( $taxonomy->display_toc ) {
+					$content .= '[mbdsc_taxonomy_field story="' . $slug . '" tax="' . $taxonomy->slug . '"]';
+				}
+			}
 
 
-			$content .= '[mbdsc_toc story="' . $slug . '"]';
+			$content .= '[mbdsc_toc story="' . $slug . '" word_count="yes"]';
 		}
 
 		return apply_filters( 'mbdsc_story_content', $content );
@@ -310,9 +313,11 @@ global $post;
 		global $post;
 		$slug = $post->post_name;
 
-			$content = '[mbdsc_cover link="yes" story="' . $slug . '"]';
 
-			$content .= '[mbdsc_summary story="' . $slug . '"]';
+
+			$content = '[mbdsc_summary story="' . $slug . '"]';
+
+			$content .= '[mbdsc_cover link="yes" story="' . $slug . '"]';
 
 			return $content;
 	}

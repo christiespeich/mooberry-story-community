@@ -36,12 +36,22 @@ class Mooberry_Story_Community_Main_Settings_Page  extends Mooberry_Story_Commun
 
 	protected function add_fields_on_first_tab() {
 		$this->add_field( array(
-				'id'      => 'mbdsc_coming_soon',
+				'id'      => 'mbdsc_review_settings_title',
 				'type'    => 'title',
 
-				'name'  =>  'COMING SOON'
+				'name'  =>  __('REVIEWS', 'mooberry-story-community')
 			)
 		);
+
+		$this->add_field( array(
+			'id'    =>  'mbdsc_review_show_email',
+			'name'  =>  __('Display Reviewer\'s Email Address With Review?', 'mooberry-story-community'),
+			'type'  =>  'select',
+'options'   => array ('' => '',
+	'yes'   =>  'Yes',
+	'no'    =>  'No')
+		));
+
 
 
 	}

@@ -98,4 +98,11 @@ class Mooberry_Story_Community_Admin {
 		//$taxonomies = Mooberry_Story_Community_Custom_Taxonomies_Settings::get_taxonomies();
 	}
 
+
+	public function flush_rewrite_rules() {
+		if (get_option('mbdsc_flush_rules', false)) {
+			flush_rewrite_rules();
+			delete_option('mbdsc_flush_rules');
+		}
+	}
 }

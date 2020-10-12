@@ -212,7 +212,8 @@ class Mooberry_Story_Community_Taxonomy_Fields_Tab extends Mooberry_Story_Commun
 
 			// re-register the CPT to register the taxonomies
 			new Mooberry_Story_Community_Story_CPT();
-			flush_rewrite_rules();
+//			flush_rewrite_rules();
+			update_option('mbdsc_flush_rules', true);
 		}
 
 	}

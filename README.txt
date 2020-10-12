@@ -55,7 +55,7 @@ you put the stable version, in order to eliminate any doubt.
 
 == Changelog ==
 
-=0.2 =
+= 0.2 =
 * Comma-separate taxonomies on story page
 * fix checkbox validation issue for taxonomies
 * add update handling

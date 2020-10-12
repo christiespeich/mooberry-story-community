@@ -136,12 +136,20 @@ class Mooberry_Story_Community {
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/class-post-object.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-story-cpt.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter-cpt.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/reviews/class-review-cpt.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/class-taxonomy.php';
 
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-story.php';
-		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-story-collection.php';
+
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter-collection.php';
+
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/authors/class-author.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/authors/class-author-cpt.php';
+
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/reviews/class-review.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/reviews/class-review-collection.php';
 
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-updated-stories-widget.php';
         require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-taxonomy-widget.php';
@@ -196,6 +204,7 @@ class Mooberry_Story_Community {
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_scripts' ) );
 
+		add_action( 'admin_init', array( $plugin_admin, 'flush_rewrite_rules' ) );
 		add_action( 'cmb2_admin_init', array( $plugin_admin, 'register_options_metabox' ) );
 
 	}
@@ -214,10 +223,17 @@ class Mooberry_Story_Community {
 		add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_scripts' ) );
 
+		//add_filter( 'the_content', array( $plugin_public, 'author_profile_page' ) );
+
+
+
 		// shortcodes
+		add_shortcode( 'mbdsc_title', array( $plugin_public, 'shortcode_title' ) );
+		add_shortcode( 'mbdsc_author', array( $plugin_public, 'shortcode_author' ) );
 		add_shortcode( 'mbdsc_cover', array( $plugin_public, 'shortcode_cover' ) );
 		add_shortcode( 'mbdsc_summary', array( $plugin_public, 'shortcode_summary' ) );
 		add_shortcode( 'mbdsc_complete', array( $plugin_public, 'shortcode_complete' ) );
+		add_shortcode( 'mbdsc_story_word_count', array( $plugin_public, 'shortcode_story_word_count' ) );
 		add_shortcode( 'mbdsc_custom_field_story', array( $plugin_public, 'shortcode_custom_field_story' ) );
 		add_shortcode( 'mbdsc_custom_field_chapter', array( $plugin_public, 'shortcode_custom_field_chapter' ) );
 		add_shortcode( 'mbdsc_taxonomy_field', array( $plugin_public, 'shortcode_taxonomy_field' ) );
@@ -225,20 +241,24 @@ class Mooberry_Story_Community {
 		add_shortcode( 'mbdsc_toc_link', array( $plugin_public, 'shortcode_toc_link' ) );
 		add_shortcode( 'mbdsc_prev', array( $plugin_public, 'shortcode_prev' ) );
 		add_shortcode( 'mbdsc_next', array( $plugin_public, 'shortcode_next' ) );
-
-
-
-
+		add_shortcode( 'mbdsc_author_pic', array( $plugin_public, 'shortcode_author_pic' ) );
+		add_shortcode( 'mbdsc_author_bio', array( $plugin_public, 'shortcode_author_bio' ) );
+		add_shortcode( 'mbdsc_author_stories', array( $plugin_public, 'shortcode_author_stories' ) );
+		add_shortcode( 'mbdsc_review_form', array( $plugin_public, 'shortcode_review_form' ) );
+		add_shortcode( 'mbdsc_reviews', array( $plugin_public, 'shortcode_chapter_reviews') );
+		add_shortcode( 'mbdsc_review', array( $plugin_public, 'shortcode_review') );
 
 	}
 
 
 
 	private function register_cpts() {
-		$story = new Mooberry_Story_Community_Story_CPT();
+		$story   = new Mooberry_Story_Community_Story_CPT();
 		$chapter = new Mooberry_Story_Community_Chapter_CPT();
-
+		$user    = new Mooberry_Story_Community_Author_CPT();
+		$review    = new Mooberry_Story_Community_Review_CPT();
 	}
+
 
 	/**
 	 * The name of the plugin used to uniquely identify it within the context of

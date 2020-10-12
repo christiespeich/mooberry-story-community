@@ -80,6 +80,8 @@ class Mooberry_Story_Community_Updates {
 		// add a call to check_for_update for each version that needs update script run
 		// then add a function update_to_{version_number} where . are replaced with _
 
+		$this->run_update( '0.3' );
+
 	}
 
 	/**
@@ -114,4 +116,24 @@ class Mooberry_Story_Community_Updates {
 
 	// add update functions as needed called update_to_{version_number} where . are replaced with _
 
+	private function update_to_0_3() {
+		$author_cpt = new Mooberry_Story_Community_Author_CPT();
+		$review_cpt = new Mooberry_Story_Community_Review_CPT();
+		$cpts        = array( $author_cpt, $review_cpt );
+		foreach ( $cpts as $cpt ) {
+			$cpt->register();
+			$cpt->set_up_roles();
+		}
+
+
+
+		flush_rewrite_rules();
+
+		$users = get_users();
+		foreach ( $users as $user ) {
+			if (user_can( $user, 'edit_mbdsc_stories')) {
+				wp_insert_post(array('post_type'=>'mbdsc_author', 'post_title'=>$user->user_login, 'post_status'=>'publish', 'post_author'=>$user->ID));
+			}
+		}
+	}
 }

@@ -1,14 +1,17 @@
 <?php
 
 
-class Mooberry_Story_Community_Story extends Mooberry_Story_Post_Object {
+class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Object {
 
+
+	protected $author;
 	protected $summary;
 	protected $chapters;
 	protected $is_complete;
 	protected $taxonomies;
 	protected $cover;
 	protected $cover_id;
+	protected $word_count;
 
 
 	public function __construct( $id = 0 ) {
@@ -21,17 +24,23 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Post_Object {
 	protected function init( ) {
 		parent::init();
 
+
+		$this->author  = null;
 		$this->summary     = '';
 		$this->chapters    = array();
 		$this->is_complete = false;
 		$this->taxonomies  = array();
 		$this->cover       = '';
 		$this->cover_id    = 0;
+		$this->word_count = 0;
 
 	}
 
 	protected function load( $id, $custom_fields ) {
 		parent::load( $id, $custom_fields);
+
+
+		$this->author = new Mooberry_Story_Community_Author( $this->author_id );
 
 		$this->summary =  get_post_meta( $this->id, 'mbdsc_story_summary', true );
 		$this->cover    = get_post_meta( $this->id, 'mbdsc_story_cover', true );
@@ -39,6 +48,11 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Post_Object {
 		$this->is_complete = get_post_meta( $this->id, 'mbdsc_story_complete', true ) === "on";
 
 		$this->chapters = Mooberry_Story_Community_Chapter_Collection::get_chapters_by_story($this->id);
+		foreach ( $this->chapters as $chapter ) {
+			$this->word_count = $this->word_count + $chapter->word_count;
+		}
+
+
 
 		$taxonomies = Mooberry_Story_Community_Custom_Taxonomies_Settings::get_taxonomies();
 		foreach ( $taxonomies as $taxonomy ) {

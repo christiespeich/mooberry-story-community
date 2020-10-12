@@ -13,7 +13,7 @@
     max-height: 350px;
 }
 
-.mbdsc_story_complete_label, .mbdsc_story_custom_field_label, .mbdsc_story_taxonomy_label {
+.mbdsc_story_complete_label, .mbdsc_story_word_count_label, .mbdsc_story_custom_field_label, .mbdsc_story_taxonomy_label {
     font-weight: bold;
 }
 
@@ -46,9 +46,51 @@
     margin: 3em 0;
 }
 
+.mbdsc_chapter_reviews hr {
+    margin: 1em 0;
+}
 
-/* Story archive and taxonomy archives of stories */
-.post-type-archive-mbdsc_story img.mbdsc_cover_image, .archive article.mbdsc_story img.mbdsc_cover_image {
+#mbdsc_chapter_reviews_none {
+    font-style: italic;
+    text-align: center;
+}
+
+
+
+/* Review form */
+.mbdsc_review_email_block, .mbdsc_review_name_block {
+    margin-bottom: 1em;
+}
+.mbdsc_review_form_label {
+margin-bottom: 0;
+}
+
+textarea.mbdsc_review_content {
+    width: 100%;
+    height: 10em;
+}
+
+#mbdsc_review_submit, #mbdsc_chatper_review_loading {
+    float: right;
+    margin: 1em;
+}
+.mbdsc_review_email_notice {
+    font-style: italic;
+    font-size: 0.8em;
+}
+
+
+/* Review */
+.mbdsc_reviewer_block label {
+    display: inline;
+}
+
+.mbdsc_review_content_block {
+    margin-top: 1em;
+}
+
+/* Story archive, author archive,  and taxonomy archives of stories */
+.post-type-archive-mbdsc_story img.mbdsc_cover_image, .archive article.mbdsc_story img.mbdsc_cover_image, .single-mbdsc_author .mbdsc_cover_image {
     float: left;
     margin-right: 5em;
 }
@@ -77,4 +119,18 @@ ul.mbdsc_taxonomy_menu span.mbdsc_taxonomy_menu_toggle {
 
 ul.mbdsc_taxonomy_menu ul.children {
     margin-left: 1.5em;
+}
+
+
+
+/* Author profile page */
+.mbdsc_author_pic_profile_page {
+    width: 100px;
+    float: left;
+}
+.mbdsc_author_page_story {
+    padding-bottom: 3em;
+    display: inline-block;
+    width: 100%;
+
 }

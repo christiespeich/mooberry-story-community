@@ -113,11 +113,11 @@ class Mooberry_Story_Community_Chapter_CPT extends Mooberry_Story_Community_CPT 
 	function get_books_for_user( $field ) {
 		global $post;
 
-		$story_collection = new Mooberry_Story_Community_Story_Collection();
-		$stories          = $story_collection->get_stories_by_user( get_post_field( 'post_author', $post->ID ) );
+
+		$stories          = Mooberry_Story_Community_Story_Collection::get_stories_by_user( get_post_field( 'post_author', $post->ID ) );
 		$story_list       = array( '' => '' );
 		foreach ( $stories as $story ) {
-			$story_list[ $story->ID ] = $story->post_title;
+			$story_list[ $story->id ] = $story->title;
 		}
 
 		return $story_list;
@@ -264,11 +264,20 @@ JOIN {$wpdb->posts} as p2 on p2.ID=pm.meta_value";
             }*/
 
 			$content    .= '<div class="mbdsc_chapter_text">' . $story_text . '</div>';
+
+			$content .= '[mbdsc_review_form]';
+
 			$content    .= '[mbdsc_toc_link]';
 			$content    .= '[mbdsc_prev]';
 			$content    .= '[mbdsc_next]';
 			$content    .= '<br style="clear:both;">';
+
+			$content  .= '<h2>Reviews</h2>';
+			$content .= '[mbdsc_reviews]';
+
+
 		}
+
 
 
 		return apply_filters( 'mbdsc_chapter_content', $content );

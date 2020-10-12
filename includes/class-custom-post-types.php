@@ -162,7 +162,7 @@ abstract class Mooberry_Story_Community_CPT {
 	}
 
 	public function add_taxonomy( $taxonomy ) {
-		$this->taxonomies[ $taxonomy->slug ] = $taxonomy;
+		$this->taxonomies[ $taxonomy->taxonomy ] = $taxonomy;
 	}
 
 	public function reorder_wpseo( $priority ) {
@@ -584,7 +584,7 @@ abstract class Mooberry_Story_Community_CPT {
 
 			}
 		}
-
+/*
 		// moderator = editor
 		foreach (
 			array(
@@ -597,7 +597,7 @@ abstract class Mooberry_Story_Community_CPT {
 			foreach ( $this->moderator_level as $capability ) {
 				get_role( $role )->add_cap( $capability );
 			}
-		}
+		}*/
 
 	}
 

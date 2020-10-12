@@ -73,6 +73,7 @@ class Mooberry_Story_Community_Activator {
 
 		$story_cpt   = new Mooberry_Story_Community_Story_CPT();
 		$chapter_cpt = new Mooberry_Story_Community_Chapter_CPT();
+		$review_cpt = new Mooberry_Story_Community_Review_CPT();
 		$cpts        = array( $story_cpt, $chapter_cpt );
 		foreach ( $cpts as $cpt ) {
 			$cpt->register();

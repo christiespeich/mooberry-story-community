@@ -1,13 +1,16 @@
 <?php
 
 
-class Mooberry_Story_Post_Object {
+class Mooberry_Story_Community_Post_Object {
+
 
 	protected $id;
 	protected $post;
 	protected $title;
+	protected $author_id;
 	protected $custom_fields;
 	protected $link;
+	protected $slug;
 
 
 		public function __construct( $id = 0, $custom_fields = array() ) {
@@ -24,8 +27,10 @@ class Mooberry_Story_Post_Object {
 	protected function init() {
 		$this->id          = 0;
 		$this->post        = null;
+		$this->author_id = 0;
 		$this->title = '';
 		$this->link = '';
+		$this->slug = '';
 		$this->custom_fields = array();
 	}
 
@@ -35,6 +40,8 @@ class Mooberry_Story_Post_Object {
 		if ( $this->post ) {
 			$this->title   = $this->post->post_title;
 			$this->link = get_permalink($id);
+			$this->author_id = $this->post->post_author;
+			$this->slug = $this->post->post_name;
 		}
 
 
@@ -53,9 +60,10 @@ class Mooberry_Story_Post_Object {
 	}
 
 
-
-
 	public function __get( $name ) {
+			if ( method_exists( $this, 'get_' . $name ) ) {
+			return call_user_func( array( $this, 'get_' . $name ) );
+		}
 		if ( property_exists(  $this, $name ) )  {
 			return $this->$name;
 		}

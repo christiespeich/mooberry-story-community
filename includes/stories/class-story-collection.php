@@ -7,16 +7,29 @@ class Mooberry_Story_Community_Story_Collection {
 
 		$defaults = array(
 			'post_type' =>  'mbdsc_story',
-			'posts_per_page'    =>  -1
+			'posts_per_page'    =>  -1,
 		);
 
 		$args = array_merge( $args, $defaults );
 
 		 return get_posts($args);
+
+
 	}
 
-	public function get_stories_by_user( $user_id ) {
-		return $this->get( array('author' => $user_id));
+	public static function get_all_published_stories( ) {
+		$stories = self::get(array('post_status'=>'publish' ));
+		return self::get_story_objects($stories);
+	}
+
+	public static function get_stories_by_user( $user_id ) {
+		$stories = self::get( array('author' => $user_id));
+
+			$story_objects = array();
+		foreach ( $stories as $story ) {
+			$story_objects[] = new Mooberry_Story_Community_Story(intval($story->ID));
+		}
+		return $story_objects;
 	}
 
 	public static function get_recently_updated_stories( $limit = 0 ) {
@@ -54,6 +67,14 @@ class Mooberry_Story_Community_Story_Collection {
 		$story_objects = array();
 		foreach ( $story_ids as $story ) {
 			$story_objects[] = new Mooberry_Story_Community_Story(intval($story));
+		}
+		return $story_objects;
+	}
+
+	protected static function get_story_objects( $stories ){
+		$story_objects = array();
+		foreach ( $stories as $story ) {
+			$story_objects[] = new Mooberry_Story_Community_Story(intval($story->ID));
 		}
 		return $story_objects;
 	}
