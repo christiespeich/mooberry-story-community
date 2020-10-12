@@ -17,7 +17,9 @@ jQuery(document).ready(function () {
 });
 
 function mbdsc_submit_review( e ) {
+
     if (jQuery('#mbdsc_review_form')[0].checkValidity()) {
+          e.preventDefault();
         jQuery('#mbdsc_review_email')
           .attr('disabled', 'disabled');
         jQuery('#mbdsc_review_name')
@@ -25,8 +27,10 @@ function mbdsc_submit_review( e ) {
         jQuery('#mbdsc_review_content')
           .attr('disabled', 'disabled');
         jQuery(this)
-          .attr('disabled', 'disabled').hide();
-        jQuery('#mbdsc_chatper_review_loading').show();
+          .attr('disabled', 'disabled')
+          .hide();
+        jQuery('#mbdsc_chatper_review_loading')
+          .show();
 
         var data = {
             'action': 'mbdsc_submit_review',
@@ -40,32 +44,34 @@ function mbdsc_submit_review( e ) {
               .val(),
             'security': mbdsc_public_ajax_object.mbdsc_public_security
         }
-        var mbdsc_submit_review = jQuery.post(mbdsc_public_ajax_object.ajax_url, data);
+        console.log(data);
+        var mbdsc_submit_review = jQuery.post(mbdsc_public_ajax_object.ajax_url, data)
+                                        .always(function (results) {
+                                            jQuery('#mbdsc_review_email')
+                                              .removeAttr('disabled', 'disabled');
+                                            jQuery('#mbdsc_review_content')
+                                              .removeAttr('disabled', 'disabled');
+                                            jQuery('#mbdsc_review_name')
+                                              .removeAttr('disabled', 'disabled');
+                                            jQuery('#mbdsc_review_submit')
+                                              .removeAttr('disabled', 'disabled')
+                                              .show();
+                                            jQuery('#mbdsc_chatper_review_loading')
+                                              .hide();
 
-        mbdsc_submit_review.done(function (results) {
-            jQuery('#mbdsc_review_form')[0].reset();
+                                        })
+                                        .done(function (results) {
+                                            jQuery('#mbdsc_review_form')[0].reset();
 
-            jQuery('.mbdsc_chapter_reviews').prepend(results);
+                                            jQuery('.mbdsc_chapter_reviews')
+                                              .prepend(results);
 
+                                        })
+                                        .fail(function (results) {
+                                            alert('Sorry, an error occurred.');
+                                        })
 
-        });
-        mbdsc_submit_review.fail( function (results)  {
-            alert('Sorry, an error occurred.');
-        });
-
-        mbdsc_submit_review.always(function (results) {
-            e.preventDefault();
-            jQuery('#mbdsc_review_email')
-              .removeAttr('disabled', 'disabled');
-            jQuery('#mbdsc_review_content')
-              .removeAttr('disabled', 'disabled');
-            jQuery('#mbdsc_review_name')
-              .removeAttr('disabled', 'disabled');
-            jQuery('#mbdsc_review_submit')
-              .removeAttr('disabled', 'disabled').show();
-            jQuery('#mbdsc_chatper_review_loading').hide();
-
-        });
+                                       ;
 
     }
 
