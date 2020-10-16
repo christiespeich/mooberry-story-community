@@ -552,6 +552,53 @@ abstract class Mooberry_Story_Community_CPT {
 		}
 	}
 
+	public function remove_role_caps() {
+	    foreach (
+			array(
+				'contributor',
+
+				'administrator'
+			) as $role
+		) {
+	        $role_obj = get_role($role);
+			foreach ( $this->moderated_author_level as $capability ) {
+				$role_obj->remove_cap( $capability );
+			}
+		}
+
+		// author == author
+		foreach (
+			array(
+				'author',
+
+				'administrator'
+			) as $role
+		) {
+		     $role_obj = get_role($role);
+			foreach ( $this->author_level as $capability ) {
+				  $role_obj->remove_cap( $capability );
+
+			}
+		}
+
+		// moderator = editor
+		foreach (
+			array(
+				'editor',
+			//	MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR,
+				MOOBERRY_STORY_COMMUNITY_ROLE_ADMIN,
+				'administrator'
+			) as $role
+		) {
+		      $role_obj = get_role($role);
+			foreach ( $this->moderator_level as $capability ) {
+				$role_obj->remove_cap( $capability );
+			}
+		}
+
+    }
+
+
 	public function set_up_roles() {
 		// moderated author = contributor
 		foreach (
@@ -584,7 +631,7 @@ abstract class Mooberry_Story_Community_CPT {
 
 			}
 		}
-/*
+
 		// moderator = editor
 		foreach (
 			array(
@@ -597,7 +644,7 @@ abstract class Mooberry_Story_Community_CPT {
 			foreach ( $this->moderator_level as $capability ) {
 				get_role( $role )->add_cap( $capability );
 			}
-		}*/
+		}
 
 	}
 
