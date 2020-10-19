@@ -24,12 +24,22 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 
 		);
 
-$this->set_up_role_levels();
+		$this->set_up_role_levels();
 		add_filter( 'the_content', array( $this, 'content' ) );
+		add_filter( 'the_title', array( $this, 'title' ), 10, 2 );
 
 
 	}
 
+	// return display name
+	public function title( $title, $post_id ) {
+		if ( get_post_type( $post_id ) == $this->post_type ) {
+			$author = new Mooberry_Story_Community_Author( get_post_field('post_author', $post_id ) );
+			$title = $author->display_name;
+
+		}
+		return $title;
+	}
 
 	public function set_up_role_levels() {
 		$single = $this->single;
