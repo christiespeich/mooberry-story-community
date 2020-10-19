@@ -222,8 +222,31 @@ class Mooberry_Story_Community_Review_CPT extends Mooberry_Story_Community_CPT {
 				update_post_meta( $new_review_id, 'mbdsc_reviewer_name', $name);
 				update_post_meta( $new_review_id, 'mbdsc_reviewer_email', $email);
 
+				// notify author
+				/*Chapter 12 of your story Title has received a new review:
+				Reviewer:
+				Submitted: October 5, 2020 12:28 pm
+				Review:
+				*/
+				$story = new Mooberry_Story_Community_Story( $chapter->story_id );
+				$chapter_title = $chapter->title;
+				$story_title = $story->title;
+				 $author_email = $story->author->user->user_email;
+				$message = do_shortcode("The chapter \"$chapter_title\" of your story $story_title has received a new review!
+				\r\n <br> \r\n <br>[mbdsc_review review='$new_review_id']");
+
+
+				$subject = "New review for $story_title!";
+				if (strlen( $subject ) > 40 ) {
+					$subject = substr( $subject, 0, 40 ) . '...';
+				}
+
+		wp_mail( $author_email, $subject, ( $message ), array(
+			"Content-Type: text/html; charset=UTF-8",
+		) );
+
 			}
-			echo do_shortcode('[mbdsc_review review="' . $new_review_id . '"]<hr>');
+			echo json_encode( array('count'=> $chapter->review_count+1, 'review' => do_shortcode('[mbdsc_review review="' . $new_review_id . '"]<hr>') ) );
 
 		}
 
