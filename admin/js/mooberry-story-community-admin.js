@@ -137,8 +137,6 @@ function mbdsc_edit_chapter (event) {
 	jQuery('#mbdsc_edit_chapter_id')
 	  .val(chapter)
 
-	console.log(chapter)
-	console.log(mbdsc_admin_ajax_object.mbdsc_admin_security)
 
 	jQuery('#mbdsc_chapter_form_loading')
 	  .show()
@@ -160,7 +158,6 @@ function mbdsc_edit_chapter (event) {
 	var mbdsc_get_chapter = jQuery.post(mbdsc_admin_ajax_object.ajax_url, data)
 
 	mbdsc_get_chapter.done(function (results) {
-		console.log(jQuery.parseJSON(results))
 
 		jQuery('.ui-dialog-buttonset')
 		  .children('button')
@@ -174,7 +171,7 @@ function mbdsc_edit_chapter (event) {
 		jQuery('#mbdsc_chapter_form')
 		  .show()
 
-		response = jQuery.parseJSON(results)
+		response = JSON.parse(results)
 
 		jQuery('#mbdsc_chapter_title')
 		  .val(response.title)
@@ -207,8 +204,7 @@ function addChapter () {
 	  .val()
 	var chapter = tinymce.editors.mbdsc_chapter_text.getContent()
 
-	console.log(title)
-	console.log(chapter)
+
 
 	var chapter_id = jQuery('#mbdsc_edit_chapter_id')
 	  .val()
@@ -248,7 +244,7 @@ function addChapter () {
 	})
 
 	mbdsc_save_chapter.done(function (new_chapter_info) {
-		var new_chapter = jQuery.parseJSON(new_chapter_info)
+		var new_chapter = JSON.parse(new_chapter_info)
 
 		var new_chapter_id = new_chapter.new_chapter_id
 		var new_chapter_link = new_chapter.new_chapter_url
@@ -283,8 +279,7 @@ function addChapter () {
 			mbdsc_chapter_list_update()
 
 		} else {
-			console.log(title)
-			console.log(chapter_id)
+
 			jQuery('#mbdsc_chapter_title_' + chapter_id)
 			  .html(title)
 		}
