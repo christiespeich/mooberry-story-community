@@ -38,6 +38,7 @@ class Mooberry_Story_Community_Story_Collection {
 			'order' =>  'DESC',
 			'post_type' =>  array('mbdsc_chapter', 'mbdsc_story'),
 			'post_status' => 'publish',
+			'posts_per_page' => -1,
 		) );
 
 		$story_ids = array();
