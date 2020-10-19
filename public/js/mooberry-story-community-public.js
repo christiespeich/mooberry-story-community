@@ -44,7 +44,7 @@ function mbdsc_submit_review( e ) {
               .val(),
             'security': mbdsc_public_ajax_object.mbdsc_public_security
         }
-        console.log(data);
+
         var mbdsc_submit_review = jQuery.post(mbdsc_public_ajax_object.ajax_url, data)
                                         .always(function (results) {
                                             jQuery('#mbdsc_review_email')
@@ -61,10 +61,14 @@ function mbdsc_submit_review( e ) {
 
                                         })
                                         .done(function (results) {
+
                                             jQuery('#mbdsc_review_form')[0].reset();
 
+                                            var review_data = JSON.parse(results);
+
+                                            jQuery('.mbdsc_chapter_review_count').html(review_data.count);
                                             jQuery('.mbdsc_chapter_reviews')
-                                              .prepend(results);
+                                              .prepend(review_data.review);
 
                                         })
                                         .fail(function (results) {
