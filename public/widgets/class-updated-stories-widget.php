@@ -48,7 +48,8 @@ class Mooberry_Story_Community_Updated_Stories_Widget extends WP_Widget {
 		echo $before_widget;
 		echo $before_title . esc_html($instance['mbds_sw_title']) . $after_title;
 
-		$stories = Mooberry_Story_Community_Story_Collection::get_recently_updated_stories(10);
+		$limit = isset( $instance['mbds_story_limit'] ) ? intval($instance['mbds_story_limit']) : 10;
+		$stories = Mooberry_Story_Community_Story_Collection::get_recently_updated_stories($limit );
 
 		if ($stories != null) {
 			echo '<ul class="mbs_story_widget_list">';
