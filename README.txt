@@ -4,7 +4,7 @@ Donate link: http://www.mooberrydreams.com
 Tags: comments, spam
 Requires at least: 3.8.0
 Tested up to: 5.5
-Stable tag: 0.5
+Stable tag: 0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,12 @@ you put the stable version, in order to eliminate any doubt.
 == Screenshots ==
 
 == Changelog ==
+
+= 0.6 =
+* Fixed: properly limit stories in widget
+* Fixed: use display name in title of author CPTS (profile page)
+* Added: count of reviews in Table of Contents and chapter pages
+* Added: Email authors with new reviews
 
 = 0.5 =
 * Fix roles for reviews
