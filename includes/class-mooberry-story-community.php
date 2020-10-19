@@ -247,6 +247,7 @@ class Mooberry_Story_Community {
 		add_shortcode( 'mbdsc_review_form', array( $plugin_public, 'shortcode_review_form' ) );
 		add_shortcode( 'mbdsc_reviews', array( $plugin_public, 'shortcode_chapter_reviews') );
 		add_shortcode( 'mbdsc_review', array( $plugin_public, 'shortcode_review') );
+		add_shortcode( 'mbdsc_review_count', array( $plugin_public, 'shortcode_chapter_review_count') );
 
 	}
 

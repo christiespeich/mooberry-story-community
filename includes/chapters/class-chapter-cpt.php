@@ -272,7 +272,7 @@ JOIN {$wpdb->posts} as p2 on p2.ID=pm.meta_value";
 			$content    .= '[mbdsc_next]';
 			$content    .= '<br style="clear:both;">';
 
-			$content  .= '<h2>Reviews</h2>';
+			$content  .= '<h2>Reviews ( [mbdsc_review_count] )</h2>';
 			$content .= '[mbdsc_reviews]';
 
 

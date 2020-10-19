@@ -330,7 +330,8 @@ class Mooberry_Story_Community_Public {
 
 		$atts  = shortcode_atts( array(
 			'story' => null,
-			'word_count'    =>  'no'
+			'word_count'    =>  'no',
+			'review_count'    =>  'no'
 		), $atts );
 		$story = $this->get_story_from_shortcode_atts( $atts['story'] );
 		if ( $story ) {
@@ -346,9 +347,13 @@ class Mooberry_Story_Community_Public {
 				$content .= '<span class="mbdsc_toc_chapter_title">' . esc_html( $chapter->title ) . '</span></a>';
 
 				if ( $atts['word_count'] === 'yes' ) {
-					$words =$chapter->word_count == 1 ? 'word' : 'words';
 					$content .= ' <span class="mbdsc_toc_chapter_word_count">( ' . $chapter->word_count . ' ' . _n('word', 'words', $chapter->word_count, 'mooberry-story-community') . ')</span>';
 				}
+				if ( $atts['review_count'] === 'yes' ) {
+					$content .= ' <span class="mbdsc_toc_chapter_review_count">( ' . $chapter->review_count . ' ' . _n('review', 'reviews', $chapter->review_count, 'mooberry-story-community') . ')</span>';
+
+				}
+
 				$content .= '</li>';
 			}
 			$content .= '</ol>';
@@ -561,6 +566,18 @@ $show_email = Mooberry_Story_Community_Main_Settings::get_review_show_email();
 
 		return $content;
 
+	}
+
+	public function shortcode_chapter_review_count( $atts, $content ) {
+		$atts = shortcode_atts( array(
+				'chapter' => 0,
+			), $atts );
+
+
+			$chapter = $this->get_chapter_from_shortcode_atts( $atts['chapter'] );
+			$content    = '<span class="mbdsc_chapter_review_count">' .  $chapter->review_count . '</span>';
+
+			return apply_filters('mbdbsc_chapter_review_count_shortcode', $content, $atts);
 	}
 }
 /*

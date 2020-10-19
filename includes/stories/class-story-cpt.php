@@ -302,7 +302,7 @@ function save_chapter() {
 			}
 
 
-			$content .= '[mbdsc_toc story="' . $slug . '" word_count="yes"]';
+			$content .= '[mbdsc_toc story="' . $slug . '" word_count="yes" review_count="yes"]';
 		}
 
 		return apply_filters( 'mbdsc_story_content', $content );

@@ -12,6 +12,7 @@ class Mooberry_Story_Community_Chapter extends Mooberry_Story_Community_Post_Obj
 	protected $word_count;
 	protected $reviews;
 
+
 	public function __construct( $id = 0) {
 
 		parent::__construct($id, Mooberry_Story_Community_Custom_Fields_Settings::get_custom_chapter_fields() );
@@ -50,6 +51,10 @@ class Mooberry_Story_Community_Chapter extends Mooberry_Story_Community_Post_Obj
 		$count            = str_word_count( $strip_tags );
 
 		return $count;
+	}
+
+	protected function get_review_count() {
+		return count($this->reviews);
 	}
 
 	public function __get( $name ) {
