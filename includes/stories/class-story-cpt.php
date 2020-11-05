@@ -313,9 +313,9 @@ function save_chapter() {
 		global $post;
 		$slug = $post->post_name;
 
+			$content = '[mbdsc_author byline="yes" story="' . $slug . '"]';
 
-
-			$content = '[mbdsc_summary story="' . $slug . '"]';
+			$content .= '[mbdsc_summary story="' . $slug . '"]';
 
 			$content .= '[mbdsc_cover link="yes" story="' . $slug . '"]';
 

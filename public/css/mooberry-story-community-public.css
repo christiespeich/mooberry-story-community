@@ -95,6 +95,10 @@ textarea.mbdsc_review_content {
     margin-right: 5em;
 }
 
+.post-type-archive-mbdsc_story .type-mbdsc_story .mbdsc_author {
+    padding-bottom: 1em;
+}
+
 
 
 /* Taxonomy Widget */
