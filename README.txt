@@ -4,7 +4,7 @@ Donate link: http://www.mooberrydreams.com
 Tags: comments, spam
 Requires at least: 3.8.0
 Tested up to: 5.5
-Stable tag: 0.8
+Stable tag: 0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,10 @@ you put the stable version, in order to eliminate any doubt.
 == Screenshots ==
 
 == Changelog ==
+
+= 0.9 =
+* Fixed: Create author CPT entries when new user registers
+* Fixed: Make sure all authors have an author CPT entry
 
 = 0.8 =
 * Fixed: Add author name to /story archive page

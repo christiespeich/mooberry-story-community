@@ -76,17 +76,27 @@ class Mooberry_Story_Community_Public {
 		wp_enqueue_script( $this->plugin_name . '-public', plugin_dir_url( __FILE__ ) . 'js/mooberry-story-community-public.js', array( 'jquery' ), $this->version, false );
 
 		wp_localize_script( $this->plugin_name . '-public', 'mbdsc_public_ajax_object', array(
-			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'ajax_url'              => admin_url( 'admin-ajax.php' ),
 			'mbdsc_public_security' => wp_create_nonce( 'mbdsc_public_ajax_nonce' ),
 
 		) );
 
 	}
 
+	public function add_new_user( $user_id ) {
+		$wp_user = get_user_by( 'ID', $user_id );
+		if ( user_can( $wp_user, 'edit_mbdsc_stories' ) ) {
+			wp_insert_post( array(
+				'post_type'   => 'mbdsc_author',
+				'post_title'  => $wp_user->user_login,
+				'post_status' => 'publish',
+				'post_author' => $wp_user->ID,
+			) );
+		}
+	}
 
 
-
-	protected function get_post_id_from_shortcode_atts(  $post_type, $id_or_slug = 0 ) {
+	protected function get_post_id_from_shortcode_atts( $post_type, $id_or_slug = 0 ) {
 
 		$post_id = 0;
 
@@ -108,23 +118,28 @@ class Mooberry_Story_Community_Public {
 				}
 			}
 		}
+
 		return $post_id;
 
 	}
+
 	protected function get_story_from_shortcode_atts( $story = 0 ) {
 		$story_id = $this->get_post_id_from_shortcode_atts( 'mbdsc_story', $story );
+
 		return new Mooberry_Story_Community_Story( $story_id );
 
 	}
 
 	protected function get_chapter_from_shortcode_atts( $chapter = 0 ) {
-		$chapter_id = $this->get_post_id_from_shortcode_atts( 'mbdsc_chapter', $chapter);
+		$chapter_id = $this->get_post_id_from_shortcode_atts( 'mbdsc_chapter', $chapter );
+
 		return new Mooberry_Story_Community_Chapter( $chapter_id );
 
 	}
 
 	protected function get_review_from_shortcode_atts( $review = 0 ) {
-		$review_id = $this->get_post_id_from_shortcode_atts( 'mbdsc_review', $review);
+		$review_id = $this->get_post_id_from_shortcode_atts( 'mbdsc_review', $review );
+
 		return new Mooberry_Story_Community_Review( $review_id );
 	}
 
@@ -134,10 +149,10 @@ class Mooberry_Story_Community_Public {
 		if ( $author == 0 ) {
 			$author_id = get_current_user_id();
 		} else {
-			if ( is_numeric($author)) {
-				$author_id = intval($author);
+			if ( is_numeric( $author ) ) {
+				$author_id = intval( $author );
 			} else {
-				$user  = get_user_by('login', $author);
+				$user = get_user_by( 'login', $author );
 				if ( $user ) {
 					$author_id = $user->ID;
 				}
@@ -167,33 +182,34 @@ class Mooberry_Story_Community_Public {
 
 	}
 
-	public function shortcode_title( $atts, $content )  {
+	public function shortcode_title( $atts, $content ) {
 
-				$atts  = shortcode_atts( array(
+		$atts  = shortcode_atts( array(
 			'story' => null,
 			'link'  => 'yes',
 		), $atts );
 		$story = $this->get_story_from_shortcode_atts( $atts['story'] );
 		if ( $story ) {
-				$content = $story->title;
-				if ( $atts['link'] == 'yes') {
+			$content = $story->title;
+			if ( $atts['link'] == 'yes' ) {
 				$content = '<a href="' . $story->link . '">' . $content . '</a>';
 			}
 
 
 		}
+
 		return apply_filters( 'mbdsc_title_shortcode', $content, $atts );
 	}
 
 	public function shortcode_author( $atts, $content ) {
-			$atts  = shortcode_atts( array(
-			'story' => null,
-			'byline'  => 'no',
+		$atts  = shortcode_atts( array(
+			'story'  => null,
+			'byline' => 'no',
 		), $atts );
 		$story = $this->get_story_from_shortcode_atts( $atts['story'] );
 		if ( $story ) {
 			$content = '<div class="mbdsc_author">';
-			if ( $atts['byline'] == 'yes') {
+			if ( $atts['byline'] == 'yes' ) {
 				$content .= '<span class="mbdsc_author_byline">By </span>';
 			}
 			$content .= '<a href="' . $story->author->link . '">' . $story->author->display_name . '</a></div>';
@@ -211,7 +227,7 @@ class Mooberry_Story_Community_Public {
 		$story = $this->get_story_from_shortcode_atts( $atts['story'] );
 		if ( $story ) {
 			$content = '<img class="mbdsc_cover_image" src="' . esc_attr( $story->cover ) . '">';
-			if ( $atts['link'] == 'yes') {
+			if ( $atts['link'] == 'yes' ) {
 				$content = '<a href="' . $story->link . '">' . $content . '</a>';
 			}
 
@@ -258,31 +274,32 @@ class Mooberry_Story_Community_Public {
 		), $atts );
 		$story = $this->get_story_from_shortcode_atts( $atts['story'] );
 		if ( $story ) {
-			$content  = '<div class="mbdsc_story_word_count">';
-			$content  .= '<span class="mbdsc_story_word_count_label">Words:</span> <span class="mbdsc_story_word_count_value">' . $story->word_count . '</span>';
-			$content  .= '</div>';
+			$content = '<div class="mbdsc_story_word_count">';
+			$content .= '<span class="mbdsc_story_word_count_label">Words:</span> <span class="mbdsc_story_word_count_value">' . $story->word_count . '</span>';
+			$content .= '</div>';
 		}
 
 		return apply_filters( 'mbdsc_story_word_count_shortcode', $content, $atts );
 	}
 
-	protected function custom_field_output ( $object, $atts ) {
-			$field   = isset( $object->custom_fields[ $atts['field'] ] ) ? $object->custom_fields[ $atts['field'] ] : null;
-			$content = '';
-			if ( $field && $field->value != '' ) {
-				$content = '<div class="mbdsc_story_custom_field mbdsc_story_custom_field_' . $field->unique_id . '">';
-				$content .= '<span class="mbdsc_story_custom_field_label mbdsc_story_custom_field_' . $field->unique_id . '_label">' . $field->name . ':</span> <span class="mbdsc_story_custom_field_value mbdsc_story_custom_field_' . $field->unique_id . '_value">' . $field->value . '</span>';
-				$content .= '</div>';
+	protected function custom_field_output( $object, $atts ) {
+		$field   = isset( $object->custom_fields[ $atts['field'] ] ) ? $object->custom_fields[ $atts['field'] ] : null;
+		$content = '';
+		if ( $field && $field->value != '' ) {
+			$content = '<div class="mbdsc_story_custom_field mbdsc_story_custom_field_' . $field->unique_id . '">';
+			$content .= '<span class="mbdsc_story_custom_field_label mbdsc_story_custom_field_' . $field->unique_id . '_label">' . $field->name . ':</span> <span class="mbdsc_story_custom_field_value mbdsc_story_custom_field_' . $field->unique_id . '_value">' . $field->value . '</span>';
+			$content .= '</div>';
 
-			}
-			return apply_filters('mbdsc_custom_field_shortcode', $content);
+		}
+
+		return apply_filters( 'mbdsc_custom_field_shortcode', $content );
 	}
 
 	public function shortcode_custom_field_story( $atts, $content ) {
 
 		$atts = shortcode_atts( array(
 			'story' => null,
-			'field' => ''
+			'field' => '',
 		), $atts );
 
 		$story = $this->get_story_from_shortcode_atts( $atts['story'] );
@@ -297,7 +314,7 @@ class Mooberry_Story_Community_Public {
 
 		$atts = shortcode_atts( array(
 			'chapter' => null,
-			'field' => ''
+			'field'   => '',
 		), $atts );
 
 		$chapter = $this->get_chapter_from_shortcode_atts( $atts['chapter'] );
@@ -329,9 +346,9 @@ class Mooberry_Story_Community_Public {
 	public function shortcode_toc( $atts, $content ) {
 
 		$atts  = shortcode_atts( array(
-			'story' => null,
-			'word_count'    =>  'no',
-			'review_count'    =>  'no'
+			'story'        => null,
+			'word_count'   => 'no',
+			'review_count' => 'no',
 		), $atts );
 		$story = $this->get_story_from_shortcode_atts( $atts['story'] );
 		if ( $story ) {
@@ -347,17 +364,17 @@ class Mooberry_Story_Community_Public {
 				$content .= '<span class="mbdsc_toc_chapter_title">' . esc_html( $chapter->title ) . '</span></a>';
 
 				if ( $atts['word_count'] === 'yes' ) {
-					$content .= ' <span class="mbdsc_toc_chapter_word_count">( ' . $chapter->word_count . ' ' . _n('word', 'words', $chapter->word_count, 'mooberry-story-community') . ')</span>';
+					$content .= ' <span class="mbdsc_toc_chapter_word_count">( ' . $chapter->word_count . ' ' . _n( 'word', 'words', $chapter->word_count, 'mooberry-story-community' ) . ')</span>';
 				}
 				if ( $atts['review_count'] === 'yes' ) {
-					$content .= ' <span class="mbdsc_toc_chapter_review_count">( ' . $chapter->review_count . ' ' . _n('review', 'reviews', $chapter->review_count, 'mooberry-story-community') . ')</span>';
+					$content .= ' <span class="mbdsc_toc_chapter_review_count">( ' . $chapter->review_count . ' ' . _n( 'review', 'reviews', $chapter->review_count, 'mooberry-story-community' ) . ')</span>';
 
 				}
 
 				$content .= '</li>';
 			}
 			$content .= '</ol>';
-		//	$content .= '</div>';
+			//	$content .= '</div>';
 
 		}
 
@@ -384,27 +401,28 @@ class Mooberry_Story_Community_Public {
 		if ( $story ) {
 			global $post;
 			if ( $post ) {
-				$chapter_id   = $post->ID;
+				$chapter_id = $post->ID;
 				if ( $next ) {
 					$chapter = $story->get_next_chapter( $chapter_id );
-					$text = 'Next';
+					$text    = 'Next';
 				} else {
 					$chapter = $story->get_prev_chapter( $chapter_id );
-					$text = 'Previous';
+					$text    = 'Previous';
 				}
 
 				if ( $chapter ) {
 
-					$content = '<div class="mbdsc_' . strtolower($text) . '">' . $text . ' Chapter: <a href="' . $chapter->link . '">';
-		/*			if ( isset( $mbds_story['_mbds_include_posts_name'] ) ) {
-						$content .= '<span class="mbs_' . $nextprev . '_posts_name">' . mbds_display_posts_name( $mbds_story, $posts[ $found ]['ID'] ) . ': </span>';
-					}*/
+					$content = '<div class="mbdsc_' . strtolower( $text ) . '">' . $text . ' Chapter: <a href="' . $chapter->link . '">';
+					/*			if ( isset( $mbds_story['_mbds_include_posts_name'] ) ) {
+									$content .= '<span class="mbs_' . $nextprev . '_posts_name">' . mbds_display_posts_name( $mbds_story, $posts[ $found ]['ID'] ) . ': </span>';
+								}*/
 					$content .= $chapter->title . '</a>';
 					$content .= '</div>';
 				}
 			}
 		}
-		return apply_filters( 'mbdsc_' . strtolower($text)  . '_shortcode', $content, $atts );
+
+		return apply_filters( 'mbdsc_' . strtolower( $text ) . '_shortcode', $content, $atts );
 
 	}
 
@@ -449,19 +467,19 @@ class Mooberry_Story_Community_Public {
 	}
 
 	public function shortcode_author_pic( $atts, $content ) {
-		$atts = shortcode_atts( array(
+		$atts   = shortcode_atts( array(
 			'author' => null,
-			'height'  => '',
-			'width' =>  '100px',
-			'class' =>  '',
+			'height' => '',
+			'width'  => '100px',
+			'class'  => '',
 		), $atts );
 		$author = $this->get_author_from_shortcode_atts( $atts['author'] );
-		$class = $atts['class'];
-		$width = $atts['width'];
+		$class  = $atts['class'];
+		$width  = $atts['width'];
 		$height = $atts['height'];
-		$width = $width != '' ? " width: $width; " : '';
+		$width  = $width != '' ? " width: $width; " : '';
 		$height = $height != '' ? " height: $height; " : '';
-		$class = $class != '' ? " class='$class' " : '';
+		$class  = $class != '' ? " class='$class' " : '';
 
 		$style = 'style="';
 		if ( $class == '' ) {
@@ -476,24 +494,24 @@ class Mooberry_Story_Community_Public {
 
 		$content = '<span class="mbdsc_author_profile_pic"><img src="' . esc_attr( $author->avatar ) . '" ' . $class . ' ' . $style . ' /></span>';
 
-		return apply_filters('mbdsc_author_profile_pic_shortcode', $content, $atts );
+		return apply_filters( 'mbdsc_author_profile_pic_shortcode', $content, $atts );
 
 	}
 
 	public function shortcode_author_bio( $atts, $content ) {
-		$atts = shortcode_atts( array(
+		$atts   = shortcode_atts( array(
 			'author' => null,
 		), $atts );
 		$author = $this->get_author_from_shortcode_atts( $atts['author'] );
 
 		$content = '<div class="mbdsc_author_bio">' . $author->bio . '</div>';
 
-		return apply_filters( 'mbdsc_author_bio_shortcode', $content, $atts);
+		return apply_filters( 'mbdsc_author_bio_shortcode', $content, $atts );
 
 	}
 
 	public function shortcode_author_stories( $atts, $content ) {
-		$atts = shortcode_atts( array(
+		$atts   = shortcode_atts( array(
 			'author' => null,
 
 		), $atts );
@@ -511,17 +529,17 @@ class Mooberry_Story_Community_Public {
 
 		}
 
-		return do_shortcode(apply_filters('mbdsc_author_stories_shortcode', $content, $atts) );
+		return do_shortcode( apply_filters( 'mbdsc_author_stories_shortcode', $content, $atts ) );
 
 	}
 
 	public function shortcode_review_form( $atts, $content ) {
-			$atts = shortcode_atts( array(
-				'chapter' => 0,
-			), $atts );
+		$atts = shortcode_atts( array(
+			'chapter' => 0,
+		), $atts );
 
-			$chapter = $this->get_chapter_from_shortcode_atts( $atts['chapter'] );
-$show_email = Mooberry_Story_Community_Main_Settings::get_review_show_email();
+		$chapter    = $this->get_chapter_from_shortcode_atts( $atts['chapter'] );
+		$show_email = Mooberry_Story_Community_Main_Settings::get_review_show_email();
 
 		ob_start();
 		include MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/partials/review-form.php';
@@ -532,34 +550,35 @@ $show_email = Mooberry_Story_Community_Main_Settings::get_review_show_email();
 
 	public function shortcode_chapter_reviews( $atts, $content ) {
 		$atts = shortcode_atts( array(
-				'chapter' => 0,
-			), $atts );
+			'chapter' => 0,
+		), $atts );
 
-		$content    = '<div class="mbdsc_chapter_reviews">';
-			$chapter = $this->get_chapter_from_shortcode_atts( $atts['chapter'] );
-			if ( count($chapter->reviews) == 0  ) {
-				$content .= '<div id="mbdsc_chapter_reviews_none">No Reviews Found</div>';
-			}
-			foreach ($chapter->reviews as $review ) {
-				$content .= '[mbdsc_review review="' . $review->id . '"]<hr>';
-			}
-			$content .= '</div>';
+		$content = '<div class="mbdsc_chapter_reviews">';
+		$chapter = $this->get_chapter_from_shortcode_atts( $atts['chapter'] );
+		if ( count( $chapter->reviews ) == 0 ) {
+			$content .= '<div id="mbdsc_chapter_reviews_none">No Reviews Found</div>';
+		}
+		foreach ( $chapter->reviews as $review ) {
+			$content .= '[mbdsc_review review="' . $review->id . '"]<hr>';
+		}
+		$content .= '</div>';
+
 		return do_shortcode( apply_filters( 'mbdsc_chapter_reviews_shortcode', $content, $atts ) );
 	}
 
 	public function shortcode_review( $atts, $content ) {
 		$atts = shortcode_atts( array(
-			'review'    =>  null,
+			'review' => null,
 		), $atts );
 
-		$review = $this->get_review_from_shortcode_atts( $atts['review'] );
-		$show_email = Mooberry_Story_Community_Main_Settings::get_review_show_email();
-		$review_content = str_replace( array("\r", "\n","\r\n"), '<br>', $review->review_content );
+		$review         = $this->get_review_from_shortcode_atts( $atts['review'] );
+		$show_email     = Mooberry_Story_Community_Main_Settings::get_review_show_email();
+		$review_content = str_replace( array( "\r", "\n", "\r\n" ), '<br>', $review->review_content );
 
 		$date_format = get_option( 'date_format' );
 		$time_format = get_option( 'time_format' );
 
-		$timestamp = date( $date_format . ' ' . $time_format, strtotime($review->timestamp));
+		$timestamp = date( $date_format . ' ' . $time_format, strtotime( $review->timestamp ) );
 		ob_start();
 		include MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/partials/review-single.php';
 		$content = ob_get_clean();
@@ -570,14 +589,14 @@ $show_email = Mooberry_Story_Community_Main_Settings::get_review_show_email();
 
 	public function shortcode_chapter_review_count( $atts, $content ) {
 		$atts = shortcode_atts( array(
-				'chapter' => 0,
-			), $atts );
+			'chapter' => 0,
+		), $atts );
 
 
-			$chapter = $this->get_chapter_from_shortcode_atts( $atts['chapter'] );
-			$content    = '<span class="mbdsc_chapter_review_count">' .  $chapter->review_count . '</span>';
+		$chapter = $this->get_chapter_from_shortcode_atts( $atts['chapter'] );
+		$content = '<span class="mbdsc_chapter_review_count">' . $chapter->review_count . '</span>';
 
-			return apply_filters('mbdbsc_chapter_review_count_shortcode', $content, $atts);
+		return apply_filters( 'mbdbsc_chapter_review_count_shortcode', $content, $atts );
 	}
 }
 /*

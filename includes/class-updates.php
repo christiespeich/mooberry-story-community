@@ -81,6 +81,7 @@ class Mooberry_Story_Community_Updates {
 		// then add a function update_to_{version_number} where . are replaced with _
 
 		$this->run_update( '0.3' );
+		$this->run_update( '0.9' );
 
 	}
 
@@ -119,20 +120,52 @@ class Mooberry_Story_Community_Updates {
 	private function update_to_0_3() {
 		$author_cpt = new Mooberry_Story_Community_Author_CPT();
 		$review_cpt = new Mooberry_Story_Community_Review_CPT();
-		$cpts        = array( $author_cpt, $review_cpt );
+		$cpts       = array( $author_cpt, $review_cpt );
 		foreach ( $cpts as $cpt ) {
 			$cpt->register();
 			$cpt->set_up_roles();
 		}
 
 
-
 		flush_rewrite_rules();
 
 		$users = get_users();
 		foreach ( $users as $user ) {
-			if (user_can( $user, 'edit_mbdsc_stories')) {
-				wp_insert_post(array('post_type'=>'mbdsc_author', 'post_title'=>$user->user_login, 'post_status'=>'publish', 'post_author'=>$user->ID));
+			if ( user_can( $user, 'edit_mbdsc_stories' ) ) {
+				wp_insert_post( array( 'post_type'   => 'mbdsc_author',
+				                       'post_title'  => $user->user_login,
+				                       'post_status' => 'publish',
+				                       'post_author' => $user->ID,
+				) );
+			}
+		}
+	}
+
+	private function update_to_0_9() {
+		$author_cpt = new Mooberry_Story_Community_Author_CPT();
+		$review_cpt = new Mooberry_Story_Community_Review_CPT();
+		$cpts       = array( $author_cpt, $review_cpt );
+		foreach ( $cpts as $cpt ) {
+			$cpt->register();
+			$cpt->set_up_roles();
+		}
+		flush_rewrite_rules();
+
+		$users = get_users();
+		foreach ( $users as $user ) {
+			if ( user_can( $user, 'edit_mbdsc_stories' ) ) {
+				$author_posts = get_posts( array( 'post_type'   => 'mbdsc_author',
+				                                  'title'       => $user->user_login,
+				                                  'fields'      => 'ids',
+				                                  'post_status' => 'publish',
+				) );
+				if ( count( $author_posts ) === 0 ) {
+					wp_insert_post( array( 'post_type'   => 'mbdsc_author',
+					                       'post_title'  => $user->user_login,
+					                       'post_status' => 'publish',
+					                       'post_author' => $user->ID,
+					) );
+				}
 			}
 		}
 	}

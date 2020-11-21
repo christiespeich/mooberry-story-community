@@ -35,7 +35,7 @@ class Mooberry_Story_Community {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
+	 * @var      string $plugin_name The string used to uniquely identify this plugin.
 	 */
 	protected $plugin_name;
 
@@ -44,7 +44,7 @@ class Mooberry_Story_Community {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      string    $version    The current version of the plugin.
+	 * @var      string $version The current version of the plugin.
 	 */
 	protected $version;
 
@@ -130,7 +130,6 @@ class Mooberry_Story_Community {
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/settings/class-custom-taxonomies-settings.php';
 
 
-
 		// CPTs
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/class-custom-post-types.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/class-post-object.php';
@@ -152,7 +151,7 @@ class Mooberry_Story_Community {
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/reviews/class-review-collection.php';
 
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-updated-stories-widget.php';
-        require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-taxonomy-widget.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-taxonomy-widget.php';
 	}
 
 	/**
@@ -225,6 +224,7 @@ class Mooberry_Story_Community {
 
 		//add_filter( 'the_content', array( $plugin_public, 'author_profile_page' ) );
 
+		add_action( 'user_register', array( $plugin_public, 'add_new_user' ), 10, 1 );
 
 
 		// shortcodes
@@ -245,19 +245,18 @@ class Mooberry_Story_Community {
 		add_shortcode( 'mbdsc_author_bio', array( $plugin_public, 'shortcode_author_bio' ) );
 		add_shortcode( 'mbdsc_author_stories', array( $plugin_public, 'shortcode_author_stories' ) );
 		add_shortcode( 'mbdsc_review_form', array( $plugin_public, 'shortcode_review_form' ) );
-		add_shortcode( 'mbdsc_reviews', array( $plugin_public, 'shortcode_chapter_reviews') );
-		add_shortcode( 'mbdsc_review', array( $plugin_public, 'shortcode_review') );
-		add_shortcode( 'mbdsc_review_count', array( $plugin_public, 'shortcode_chapter_review_count') );
+		add_shortcode( 'mbdsc_reviews', array( $plugin_public, 'shortcode_chapter_reviews' ) );
+		add_shortcode( 'mbdsc_review', array( $plugin_public, 'shortcode_review' ) );
+		add_shortcode( 'mbdsc_review_count', array( $plugin_public, 'shortcode_chapter_review_count' ) );
 
 	}
-
 
 
 	private function register_cpts() {
 		$story   = new Mooberry_Story_Community_Story_CPT();
 		$chapter = new Mooberry_Story_Community_Chapter_CPT();
 		$user    = new Mooberry_Story_Community_Author_CPT();
-		$review    = new Mooberry_Story_Community_Review_CPT();
+		$review  = new Mooberry_Story_Community_Review_CPT();
 	}
 
 
@@ -265,8 +264,8 @@ class Mooberry_Story_Community {
 	 * The name of the plugin used to uniquely identify it within the context of
 	 * WordPress and to define internationalization functionality.
 	 *
-	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
+	 * @since     1.0.0
 	 */
 	public function get_plugin_name() {
 		return $this->plugin_name;
@@ -275,8 +274,8 @@ class Mooberry_Story_Community {
 	/**
 	 * Retrieve the version number of the plugin.
 	 *
-	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
+	 * @since     1.0.0
 	 */
 	public function get_version() {
 		return $this->version;
