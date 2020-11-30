@@ -1,56 +1,59 @@
 jQuery(document)
   .ready(function () {
 
+	  // settings page
+	  jQuery('#mbdsc_create_pages_button')
+		.on('click', mbdsc_create_pages)
+
 	  // if at least one checkbox in a group is checked, then turn off the validation
 	  // for the checkbox group. HTML5 validation requires all checkboxes to be checked
 	  jQuery('#mbdsc_taxonomy_fields_metabox input[name="submit-cmb"]')
 		.on('click', mbdsc_validate_checkboxes)
-	  jQuery('.post-type-mbdsc_story #publish').on('click', mbdsc_validate_checkboxes);
+	  jQuery('.post-type-mbdsc_story #publish')
+		.on('click', mbdsc_validate_checkboxes)
 	  jQuery('.post-type-mbdsc_story input[name="save"]')
 		.on('click', mbdsc_save_story)
 
-	  dialog =
-		jQuery('#mbdsc_chapter_dialog')
-		  .dialog({
-			          dialogClass: 'no-close',
-			          autoOpen: false,
-			          height: 'auto',
-			          width: '50%',
-			          minWidth: 200,
-			          modal: true,
-			          buttons: {
-				          'Save Chaper': addChapter,
-				          Cancel: function () {
-					          if (confirm('Are you sure you want to cancel without saving?')) {
-						          dialog.dialog('close')
-					          }
-				          }
-			          },
-			          close: function () {
-				          //jQuery('#mbdsc_chapter_form')[0].reset();
-				          //allFields.removeClass( "ui-state-error" );
-				          jQuery('#mbdsc_chapter_title')
-					        .val('')
-				          jQuery('#mbdsc_edit_chapter_id')
-					        .val('')
-				          tinymce.editors.mbdsc_chapter_text.setContent('')
+	  dialog = jQuery('#mbdsc_chapter_dialog')
+		.dialog({
+			        dialogClass: 'no-close',
+			        autoOpen: false,
+			        height: 'auto',
+			        width: '50%',
+			        minWidth: 200,
+			        modal: true,
+			        buttons: {
+				        'Save Chaper': addChapter,
+				        Cancel: function () {
+					        if (confirm('Are you sure you want to cancel without saving?')) {
+						        dialog.dialog('close')
+					        }
+				        }
+			        },
+			        close: function () {
+				        //jQuery('#mbdsc_chapter_form')[0].reset();
+				        //allFields.removeClass( "ui-state-error" );
+				        jQuery('#mbdsc_chapter_title')
+				          .val('')
+				        jQuery('#mbdsc_edit_chapter_id')
+				          .val('')
+				        tinymce.editors.mbdsc_chapter_text.setContent('')
 
-				          jQuery('#mbdsc_chapter_form_error')
-					        .hide()
-				          jQuery('#mbdsc_chapter_form_loading')
-					        .hide()
-				          jQuery('#mbdsc_chapter_form')
-					        .show()
+				        jQuery('#mbdsc_chapter_form_error')
+				          .hide()
+				        jQuery('#mbdsc_chapter_form_loading')
+				          .hide()
+				        jQuery('#mbdsc_chapter_form')
+				          .show()
 
-			          }
-		          })
+			        }
+		        })
 
-	  form =
-		dialog.find('form')
-		      .on('submit', function (event) {
-			      event.preventDefault()
-			      addUser()
-		      })
+	  form = dialog.find('form')
+	               .on('submit', function (event) {
+		               event.preventDefault()
+		               addUser()
+	               })
 
 	  jQuery('.mbdsc_chapter_delete_icon')
 		.on('click', mbdsc_delete_chapter)
@@ -137,7 +140,6 @@ function mbdsc_edit_chapter (event) {
 	jQuery('#mbdsc_edit_chapter_id')
 	  .val(chapter)
 
-
 	jQuery('#mbdsc_chapter_form_loading')
 	  .show()
 	jQuery('#mbdsc_chapter_form')
@@ -203,8 +205,6 @@ function addChapter () {
 	var title = jQuery('#mbdsc_chapter_title')
 	  .val()
 	var chapter = tinymce.editors.mbdsc_chapter_text.getContent()
-
-
 
 	var chapter_id = jQuery('#mbdsc_edit_chapter_id')
 	  .val()
@@ -293,20 +293,6 @@ function mbdsc_save_story () {
 	mbdsc_order_chapters()
 }
 
-// if at least one checkbox in a group is checked, then turn off the validation
-// for the checkbox group. HTML5 validation requires all checkboxes to be checked
-function mbdsc_validate_checkboxes () {
-	jQuery('ul.cmb2-checkbox-list')
-	  .each(function () {
-		  $checkbox_list = jQuery(this)
-		  $cbx_group = $checkbox_list.find('input:required')
-
-		  $cbx_group.prop('required', true)
-		  if ($cbx_group.is(':checked')) {
-			  $cbx_group.prop('required', false)
-		  }
-	  })
-}
 
 // save the sorted grid via ajax
 function mbdsc_order_chapters () {
@@ -347,6 +333,48 @@ function mbdsc_chapter_list_update () {
 	  .on('click', mbdsc_edit_chapter)
 	jQuery('.mbdsc_chapter_delete_icon')
 	  .on('click', mbdsc_delete_chapter)
+}
+
+function mbdsc_create_pages () {
+
+	jQuery('#mbdsc_create_pages_progress')
+	  .show()
+
+	const pages = []
+	jQuery('select[id^="mbdsc_pages_"]')
+	  .each(function () {
+		  if (jQuery(this)
+			    .val() === '0') {
+			  pages.push(jQuery(this)
+				           .attr('id'))
+		  }
+	  })
+
+	var data = {
+		'action': 'mbdsc_create_pages',
+		'pages': pages,
+		'security': mbdsc_admin_ajax_object.mbdsc_admin_security
+	}
+	var mbdsc_create_pages = jQuery.post(mbdsc_admin_ajax_object.ajax_url, data)
+	mbdsc_create_pages.always(function () {
+		jQuery('#mbdsc_create_pages_progress')
+		  .hide()
+	})
+	mbdsc_create_pages.done(function (results) {
+		const added_pages = JSON.parse(results)
+
+		pages.map(function (page) {
+
+			if (added_pages[page]) {
+
+				jQuery('#' + page)
+				  .append(new Option(added_pages[page].title, added_pages[page].id))
+				  .val(added_pages[page].id)
+			}
+		})
+
+	})
+
 }
 
 

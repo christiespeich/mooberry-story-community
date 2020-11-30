@@ -1,0 +1,1 @@
+<a class="button" id="mbdsc_create_pages_button"><?php _e( 'Create missing pages', 'mooberry-story-community' ); ?></a><img src="<?php echo MOOBERRY_STORY_COMMUNITY_PLUGIN_URL; ?>/assets/ajax-loader.gif" style="display:none;" id="mbdsc_create_pages_progress"/><div id="mbdsc_create_pages_results"></div>

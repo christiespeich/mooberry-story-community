@@ -12,7 +12,7 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Objec
 	protected $cover;
 	protected $cover_id;
 	protected $word_count;
-
+	protected $review_count;
 
 	public function __construct( $id = 0 ) {
 
@@ -50,6 +50,7 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Objec
 		$this->chapters = Mooberry_Story_Community_Chapter_Collection::get_chapters_by_story($this->id);
 		foreach ( $this->chapters as $chapter ) {
 			$this->word_count = $this->word_count + $chapter->word_count;
+			$this->review_count = $this->review_count + $chapter->review_count;
 		}
 
 
@@ -71,6 +72,38 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Objec
 
 
 
+	}
+
+	public function get_most_recent_chapter() {
+		$updated_posts = get_posts( array(
+			'orderby'        => 'post_modified',
+			'order'          => 'DESC',
+			'post_type'      => array( 'mbdsc_chapter' ),
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'meta_key'       => 'mbdsc_chapter_story',
+			'meta_value'     => $this->id,
+		) );
+		if ( count( $updated_posts ) > 0 ) {
+			return new Mooberry_Story_Community_Chapter( $updated_posts[0]->ID );
+		}
+
+		return null;
+	}
+
+	public function get_most_recent_chapter_date() {
+		$chapter = $this->get_most_recent_chapter();
+		if ( $chapter ) {
+			return $chapter->last_updated;
+		}
+		return '';
+	}
+
+	public function get_chapter_count( ) {
+		if ( !is_array($this->chapters)) {
+			return 0;
+		}
+		return count( $this->chapters);
 	}
 
 	public function get_next_chapter( $chapter_id ) {

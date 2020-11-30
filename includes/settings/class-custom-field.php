@@ -37,6 +37,9 @@ class Mooberry_Story_Community_Custom_Field {
 	}
 
 	public function get_option_value( $option_key ) {
+		if ( $option_key == '' ) {
+			return '';
+		}
 		return isset( $this->options[ $option_key ] ) ? $this->options[ $option_key ]->value : '';
 	}
 	public function get_options_list( $include_blank = true ) {

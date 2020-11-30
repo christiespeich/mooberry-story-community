@@ -138,3 +138,137 @@ ul.mbdsc_taxonomy_menu ul.children {
     width: 100%;
 
 }
+
+/* Front end Account page */
+.mbdsc_account_story_table img.mbdsc_story_complete {
+    width: 1em;
+    display: block;
+    margin: auto;
+    border: none;
+    box-shadow: none;
+}
+.mbdsc_account_story_table td.mbdsc_story_title {
+    text-align: left;
+}
+.mbdsc_account_story_table td {
+    text-align: center;
+}
+.mbdsc_account_story_table img.mbdsc_story_actions, .mbdsc_account_chapter_table img.mbdsc_chapter_actions {
+    width: 1.5em;
+    margin-right: 1em;
+    border: none;
+    box-shadow: none;
+}
+
+.mbdsc_account_story_table img.mbdsc_story_delete, .mbdsc_account_chapter_table img.mbdsc_chapter_delete {
+    cursor: pointer;
+}
+
+.mbdsc_account_chapter_table_div {
+    display:none;
+
+}
+
+#mbdsc_account_chapter_table_div, #mbdsc_account_story_table_body {
+  margin: 0 auto;
+  position: relative;
+}
+
+.loading:after {
+   content: '...loading';
+   position: absolute;
+   top:0;
+   bottom: 0;
+   right: 0;
+   left: 0;
+   background: rgba(0,0,0,.3);
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.mbdsc_taxonomy_new_item, .mbdsc_taxonomy_new_item_parent, .mbdsc_taxonomy_add_new_cancel_button  {
+    display:none;
+}
+
+button.mbdsc_taxonomy_add_new_button {
+    margin-bottom: 2em;
+}
+
+.ui-state-error p {
+    margin: 0;
+    padding: 1em;
+}
+
+.ui-state-error {
+    margin-bottom: 10px;
+}
+
+
+ul.cmb2-checkbox-list.cmb2-list, ul.cmb2-radio-list.cmb2-list {
+    list-style: none;
+}
+
+.cmb-td {
+    padding-top: 0 !important;
+}
+
+.cmb-th {
+    padding-bottom: 0 !important;
+    float: none !important;
+    width: auto !important;
+}
+
+p.cmb2-metabox-description {
+    padding-bottom: .5em;
+}
+
+.cmb-td span.button-secondary {
+    display: inline-block;
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 26px;
+    height: 28px;
+    margin: 0;
+    padding: 0 10px 1px;
+    cursor: pointer;
+    border-width: 1px;
+    border-style: solid;
+    -webkit-appearance: none;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    white-space: nowrap;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #555;
+    border-color: #cccccc;
+    background: #f7f7f7;
+    -webkit-box-shadow: inset 0 1px 0 #fff, 0 1px 0 rgba(0,0,0,.08);
+    box-shadow: inset 0 1px 0 #fff, 0 1px 0 rgba(0,0,0,.08);
+    vertical-align: top;
+}
+
+.cmb-td span.button-secondary:hover,
+.cmb-td span.button-secondary:focus {
+    background: #fafafa;
+    border-color: #999;
+    color: #222;
+}
+
+.cmb-td span.button-secondary:focus {
+    -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,.2);
+    box-shadow: 1px 1px 1px rgba(0,0,0,.2);
+}
+
+.cmb-td span.button-secondary:active {
+    background: #eee;
+    border-color: #999;
+    color: #333;
+    -webkit-box-shadow: inset 0 2px 5px -3px rgba( 0, 0, 0, 0.5 );
+    box-shadow: inset 0 2px 5px -3px rgba( 0, 0, 0, 0.5 );
+}
+
+.cmb-td .cmb2-indented-hierarchy ul {
+    list-style: none;
+}

@@ -53,3 +53,11 @@
     cursor: pointer;
     cursor: hand;
 }
+
+#mbdsc_create_pages_button, #mbdsc_create_pages_progress {
+    margin-top: 1em;
+}
+
+#mbdsc_create_pages_progress {
+    margin-left: 0.5em;
+}

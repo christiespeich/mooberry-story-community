@@ -64,6 +64,15 @@ class Mooberry_Story_Community_Public {
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/mooberry-story-community-public.css', array(), $this->version, 'all' );
 
+
+		$wp_scripts = wp_scripts();
+		wp_enqueue_style( $this->plugin_name . '-admin-ui-css',
+			'http://ajax.googleapis.com/ajax/libs/jqueryui/' . $wp_scripts->registered['jquery-ui-core']->ver . '/themes/smoothness/jquery-ui.css',
+			false,
+			$this->version,
+			false );
+
+
 	}
 
 	/**
@@ -73,11 +82,21 @@ class Mooberry_Story_Community_Public {
 	 */
 	public function enqueue_scripts() {
 
-		wp_enqueue_script( $this->plugin_name . '-public', plugin_dir_url( __FILE__ ) . 'js/mooberry-story-community-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( "jquery-ui-tabs" );
+		wp_enqueue_script( 'jquery-ui-sortable' );
+
+		wp_enqueue_script( $this->plugin_name . '-common', MOOBERRY_STORY_COMMUNITY_PLUGIN_URL . 'includes/js/mooberry-story-community.js', array(
+			'jquery',
+		), $this->version, false );
+
+		wp_enqueue_script( $this->plugin_name . '-public', plugin_dir_url( __FILE__ ) . 'js/mooberry-story-community-public.js', array(
+			'jquery',
+			'jquery-ui-tabs',
+		), $this->version, false );
 
 		wp_localize_script( $this->plugin_name . '-public', 'mbdsc_public_ajax_object', array(
 			'ajax_url'              => admin_url( 'admin-ajax.php' ),
-			'mbdsc_public_security' => wp_create_nonce( 'mbdsc_public_ajax_nonce' ),
+			'mbdsc_public_security' => wp_create_nonce( 'mbdsc_story_cpt_ajax_nonce' ),
 
 		) );
 
@@ -94,6 +113,107 @@ class Mooberry_Story_Community_Public {
 			) );
 		}
 	}
+
+	/**
+ * Handles form submission on save. Redirects if save is successful, otherwise sets an error message as a cmb property
+ *
+ * @return void
+ */
+function handle_frontend_new_post_submission() {
+
+	// If no form submission, bail
+	if ( empty( $_POST ) || ! isset( $_POST['submit-cmb'], $_POST['object_id'] ) ) {
+		return;
+	}
+
+	if ( $_POST['object_id'] != 'new_story' ) {
+		return;
+	}
+
+	// Get CMB2 metabox object
+		$metaboxes = array( 'mbdsc_story_meta_box', 'mbdsc_cover_image' );
+
+			$custom_taxonomies = Mooberry_Story_Community_Custom_Taxonomies_Settings::get_taxonomies();
+			foreach ( $custom_taxonomies as $taxonomy ) {
+
+
+
+					$metaboxes[] = $taxonomy->taxonomy . '_taxonomy_public_metabox';
+
+			}
+
+$post_data = array();
+			$sanitized_values = array();
+				// Set our post data arguments
+				$post_data['post_title'] = 'New Story';
+				/*unset( $sanitized_values['submitted_post_title'] );
+				$post_data['post_content'] = $sanitized_values['submitted_post_content'];
+				unset( $sanitized_values['submitted_post_content'] );*/
+
+				$post_data['post_type'] = 'mbdsc_story';
+				$post_data['post_status'] = 'publish';
+	// Create the new post
+	$new_submission_id = wp_insert_post( $post_data, true );
+	// If we hit a snag, update the user
+
+
+			foreach ( $metaboxes as $metabox ) { // loop over config array
+				$cmb = cmb2_get_metabox( $metabox, $_POST['object_id'] );
+if ( is_wp_error( $new_submission_id ) ) {
+		return $cmb->prop( 'submission_error', $new_submission_id );
+	}
+
+
+
+				// Get our shortcode attributes and set them as our initial post_data args
+				if ( isset( $_POST['atts'] ) ) {
+					foreach ( (array) $_POST['atts'] as $key => $value ) {
+						$post_data[ $key ] = sanitize_text_field( $value );
+					}
+					unset( $_POST['atts'] );
+				}
+
+				// Check security nonce
+				if ( ! isset( $_POST[ $cmb->nonce() ] ) || ! wp_verify_nonce( $_POST[ $cmb->nonce() ], $cmb->nonce() ) ) {
+					return $cmb->prop( 'submission_error', new WP_Error( 'security_fail', __( 'Security check failed.' ) ) );
+				}
+
+				/**
+				 * Fetch sanitized values
+				 */
+				$sanitized_values =  $cmb->get_sanitized_values( $_POST ) ;
+
+	$cmb->save_fields( $new_submission_id, 'post', $sanitized_values );
+
+			}
+
+
+
+
+
+
+	/**
+	 * Other than post_type and post_status, we want
+	 * our uploaded attachment post to have the same post-data
+	 */
+/*	unset( $post_data['post_type'] );
+	unset( $post_data['post_status'] );
+
+	// Try to upload the featured image
+	$img_id = yourprefix_frontend_form_photo_upload( $new_submission_id, $post_data );
+
+	// If our photo upload was successful, set the featured image
+	if ( $img_id && ! is_wp_error( $img_id ) ) {
+		set_post_thumbnail( $new_submission_id, $img_id );
+	}*/
+
+	/*
+	 * Redirect back to the form page with a query variable with the new post ID.
+	 * This will help double-submissions with browser refreshes
+	 */
+	wp_redirect( esc_url_raw( add_query_arg( 'post_submitted', $new_submission_id ) ) );
+	exit;
+}
 
 
 	protected function get_post_id_from_shortcode_atts( $post_type, $id_or_slug = 0 ) {
@@ -597,6 +717,85 @@ class Mooberry_Story_Community_Public {
 		$content = '<span class="mbdsc_chapter_review_count">' . $chapter->review_count . '</span>';
 
 		return apply_filters( 'mbdbsc_chapter_review_count_shortcode', $content, $atts );
+	}
+
+	public function shortcode_account_page( $atts, $content ) {
+
+
+		$account_tabs = apply_filters( 'mbdsc_account_tabs', array(
+			'stories'       => __( 'Stories', 'mooberry-story-community' ),
+			'notifications' => __( 'Notifications', 'mooberry-story-community' ),
+			'profile'       => __( 'Profile', 'mooberry-story-community' ),
+		) );
+
+		$content = '<div id="mbdsc_account_page_tabs"><ul>';
+		$tabs    = '';
+		$pages   = '';
+		foreach ( $account_tabs as $tab => $title ) {
+			$tabs  .= "<li><a href='#$tab'>$title</a></li>";
+			$pages .= "<div id='$tab'>";
+			ob_start();
+			include MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . "/public/partials/$tab.php";
+			$pages .= ob_get_clean();
+			$pages .= "</div>";
+		}
+
+		$content .= $tabs . '</ul>' . $pages;
+
+		return apply_filters( 'mbdsc_account_page_shortcode', $content, $atts );
+	}
+
+	public function shortcode_edit_story_page( $atts, $content ) {
+		$story_id = absint( $_GET['story_id'] );
+		if ( $story_id > 0 ) {
+
+			$content .= '<h2>Chapters</h2>';
+			ob_start();
+			include MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/partials/chapters.php';
+			$content .= ob_get_clean();
+
+			$edit_chapter_page = Mooberry_Story_Community_Main_Settings::get_edit_chapter_page();
+
+			$content .= '<a href="' . esc_attr( get_permalink( $edit_chapter_page ) . '?story_id=' . $story_id . '&chapter_id=0' ) . '" ><button>Add Chapter</button></a>';
+
+			$content .= '<hr>';
+
+		} else {
+			$story_id = 'new_story';
+		}
+			$content .= '<div style="margin-top:2em;">';
+
+			$content .= '<h2>Story Options</h2>';
+			$content .= '<form class="cmb-form" method="post" id="mbdsc_story_meta_box" enctype="multipart/form-data" encoding="multipart/form-data">
+    <input type="hidden" name="object_id" value="' . $story_id . '">';
+
+			$args      = array( 'form_format' => '%3$s', 'echo' => false );
+			$metaboxes = array( 'mbdsc_story_meta_box', 'mbdsc_cover_image' );
+
+			$custom_taxonomies = Mooberry_Story_Community_Custom_Taxonomies_Settings::get_taxonomies();
+			foreach ( $custom_taxonomies as $taxonomy ) {
+
+
+
+					$metaboxes[] = $taxonomy->taxonomy . '_taxonomy_public_metabox';
+
+			}
+
+
+			foreach ( $metaboxes as $metabox ) { // loop over config array
+				$content .= cmb2_metabox_form( $metabox, $story_id, $args );
+			}
+
+			$content .= '<input type="submit" name="submit-cmb" value="Save" class="button-primary"></form>';
+
+			$content .= '</div>';
+
+
+			/*$content = cmb2_get_metabox_form( 'mbdsc_story_meta_box', $story_id );
+			$content .= cmb2_get_metabox_form( 'mbdsc_cover_image', $story_id );*/
+
+
+		return apply_filters( 'mbdsc_edit_story_page_shortcode', $content, $atts );
 	}
 }
 /*

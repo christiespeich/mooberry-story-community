@@ -67,6 +67,17 @@ if ( !defined('MOOBERRY_STORY_COMMUNITY_ADMIN_CAP')) {
 	define( 'MOOBERRY_STORY_COMMUNITY_ADMIN_CAP', 'mbdsc_manage_options' );
 }
 
+if ( !defined( 'MBDSC_ACCOUNT_PAGE_SHORTCODE')) {
+	define( 'MBDSC_ACCOUNT_PAGE_SHORTCODE', 'mbdsc_account');
+}
+if ( !defined( 'MBDSC_EDIT_STORY_PAGE_SHORTCODE')) {
+	define('MBDSC_EDIT_STORY_PAGE_SHORTCODE', 'mbdsc_edit_story');
+}
+
+if ( !defined( 'MBDSC_EDIT_CHAPTER_PAGE_SHORTCODE')) {
+	define('MBDSC_EDIT_CHAPTER_PAGE_SHORTCODE', 'mbdsc_edit_chapter');
+}
+
 
 
 

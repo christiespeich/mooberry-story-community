@@ -11,6 +11,8 @@ class Mooberry_Story_Community_Post_Object {
 	protected $custom_fields;
 	protected $link;
 	protected $slug;
+	protected $last_updated;
+	protected $posted;
 
 
 		public function __construct( $id = 0, $custom_fields = array() ) {
@@ -32,6 +34,8 @@ class Mooberry_Story_Community_Post_Object {
 		$this->link = '';
 		$this->slug = '';
 		$this->custom_fields = array();
+		$this->last_updated = '';
+		$this->posted = '';
 	}
 
 	protected function load( $id, $custom_fields ) {
@@ -42,6 +46,8 @@ class Mooberry_Story_Community_Post_Object {
 			$this->link = get_permalink($id);
 			$this->author_id = $this->post->post_author;
 			$this->slug = $this->post->post_name;
+			$this->last_updated = $this->post->post_modified;
+			$this->posted = $this->post->post_date;
 		}
 
 
@@ -58,6 +64,7 @@ class Mooberry_Story_Community_Post_Object {
 
 
 	}
+
 
 
 	public function __get( $name ) {

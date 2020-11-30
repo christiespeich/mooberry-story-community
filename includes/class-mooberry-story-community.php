@@ -205,6 +205,7 @@ class Mooberry_Story_Community {
 
 		add_action( 'admin_init', array( $plugin_admin, 'flush_rewrite_rules' ) );
 		add_action( 'cmb2_admin_init', array( $plugin_admin, 'register_options_metabox' ) );
+		add_action( 'wp_ajax_mbdsc_create_pages', array( $plugin_admin, 'create_pages' ) );
 
 	}
 
@@ -225,6 +226,7 @@ class Mooberry_Story_Community {
 		//add_filter( 'the_content', array( $plugin_public, 'author_profile_page' ) );
 
 		add_action( 'user_register', array( $plugin_public, 'add_new_user' ), 10, 1 );
+		add_action( 'cmb2_after_init', array( $plugin_public, 'handle_frontend_new_post_submission' ) );
 
 
 		// shortcodes
@@ -248,6 +250,9 @@ class Mooberry_Story_Community {
 		add_shortcode( 'mbdsc_reviews', array( $plugin_public, 'shortcode_chapter_reviews' ) );
 		add_shortcode( 'mbdsc_review', array( $plugin_public, 'shortcode_review' ) );
 		add_shortcode( 'mbdsc_review_count', array( $plugin_public, 'shortcode_chapter_review_count' ) );
+
+		add_shortcode( MBDSC_ACCOUNT_PAGE_SHORTCODE, array( $plugin_public, 'shortcode_account_page'));
+		add_shortcode( MBDSC_EDIT_STORY_PAGE_SHORTCODE, array( $plugin_public, 'shortcode_edit_story_page'));
 
 	}
 

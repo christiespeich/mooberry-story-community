@@ -203,7 +203,7 @@ class Mooberry_Story_Community_Review_CPT extends Mooberry_Story_Community_CPT {
 
 		// check to see if the submitted nonce matches with the
 		// generated nonce we created earlier
-		if (  ! wp_verify_nonce( $nonce, 'mbdsc_public_ajax_nonce' ) ) {
+		if (  ! wp_verify_nonce( $nonce, 'mbdsc_story_cpt_ajax_nonce' ) ) {
 			die ();
 		}
 

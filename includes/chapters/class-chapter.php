@@ -11,6 +11,7 @@ class Mooberry_Story_Community_Chapter extends Mooberry_Story_Community_Post_Obj
 	protected $order;
 	protected $word_count;
 	protected $reviews;
+	protected $review_count;
 
 
 	public function __construct( $id = 0) {
@@ -28,6 +29,7 @@ class Mooberry_Story_Community_Chapter extends Mooberry_Story_Community_Post_Obj
 		$this->order = 0;
 		$this->word_count = 0;
 		$this->reviews = array();
+		$this->review_count = 0;
 	}
 
 	protected function load ( $id, $custom_fields ) {
@@ -38,6 +40,7 @@ class Mooberry_Story_Community_Chapter extends Mooberry_Story_Community_Post_Obj
 			$this->order = get_post_meta( $id, '_mbdsc_chapter_order', true );
 			$this->word_count = $this->count_words();
 			$this->reviews = Mooberry_Story_Community_Review_Collection::get_reviews_by_chapter($this->id);
+			$this->review_count = count($this->reviews);
 
 		}
 	}
@@ -53,9 +56,6 @@ class Mooberry_Story_Community_Chapter extends Mooberry_Story_Community_Post_Obj
 		return $count;
 	}
 
-	protected function get_review_count() {
-		return count($this->reviews);
-	}
 
 	public function __get( $name ) {
 		if ( method_exists( $this, 'get_' . $name ) ) {

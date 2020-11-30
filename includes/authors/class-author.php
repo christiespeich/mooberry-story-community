@@ -7,6 +7,7 @@ class Mooberry_Story_Community_Author extends Mooberry_Story_Community_Post_Obje
 	protected $user;
 	protected $avatar;
 	protected $bio;
+	protected $story_count;
 
 	public function __construct( $user_id = 0) {
 
@@ -28,6 +29,7 @@ class Mooberry_Story_Community_Author extends Mooberry_Story_Community_Post_Obje
 		$this->link = '';
 		$this->avatar = '';
 		$this->bio = '';
+		$this->story_count = 0;
 	}
 
 	protected function load( $author_id, $custom_fields ) {
@@ -42,6 +44,8 @@ class Mooberry_Story_Community_Author extends Mooberry_Story_Community_Post_Obje
 				$this->avatar = get_avatar( $author_id );
 			}
 			$this->bio = $user->description;
+
+			$this->story_count = count( Mooberry_Story_Community_Story_Collection::get( array('author' =>$this->user_id) ));
 		}
 
 	}
