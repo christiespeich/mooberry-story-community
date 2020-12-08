@@ -332,15 +332,15 @@ function mbdsc_chapter_list_update () {
 	  .removeClass()
 	  .addClass('ui-icon')
 	// add a down arrow to the first item
-	jQuery('#mbdsc_chapter_list li:first span')
+	jQuery('#mbdsc_chapter_list li').first().children( 'span')
 	  .addClass('ui-icon-arrowthick-1-s')
 	// add an up arrow to the last item
-	jQuery('#mbdsc_chapter_list li:last span')
+	jQuery('#mbdsc_chapter_list li').last().children('span')
 	  .addClass('ui-icon-arrowthick-1-n')
 	// add an up and down arrow to any non-first and non-last item
 	jQuery('#mbdsc_chapter_list li')
-	  .not(':first')
-	  .not(':last')
+	 .not(jQuery('#mbdsc_chapter_list li').first())
+	  .not(jQuery('#mbdsc_chapter_list li').last())
 	  .children('span')
 	  .addClass('ui-icon-arrowthick-2-n-s')
 	jQuery('[id^="mbdbsc_chapter_edit_"]')
