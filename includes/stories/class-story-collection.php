@@ -25,7 +25,7 @@ class Mooberry_Story_Community_Story_Collection {
 	public static function get_stories_by_user( $user_id ) {
 		$stories = self::get( array('author' => $user_id));
 
-			$story_objects = array();
+		$story_objects = array();
 		foreach ( $stories as $story ) {
 			$story_objects[] = new Mooberry_Story_Community_Story(intval($story->ID));
 		}

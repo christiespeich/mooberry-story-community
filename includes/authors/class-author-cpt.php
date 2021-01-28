@@ -35,8 +35,8 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 	public function title( $title, $post_id ) {
 		if ( get_post_type( $post_id ) == $this->post_type ) {
 			$author = new Mooberry_Story_Community_Author( get_post_field('post_author', $post_id ) );
-			$title = $author->display_name;
-
+			$stories = Mooberry_Story_Community_Story_Collection::get_stories_by_user($author->user_id);
+			$title = $author->display_name . ' (' . count($stories) . ' stories)';
 		}
 		return $title;
 	}
