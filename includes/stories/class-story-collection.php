@@ -25,11 +25,7 @@ class Mooberry_Story_Community_Story_Collection {
 	public static function get_stories_by_user( $user_id ) {
 		$stories = self::get( array('author' => $user_id));
 
-		$story_objects = array();
-		foreach ( $stories as $story ) {
-			$story_objects[] = new Mooberry_Story_Community_Story(intval($story->ID));
-		}
-		return $story_objects;
+		return self::get_story_objects( $stories );
 	}
 
 	public static function get_recently_updated_stories( $limit = 0 ) {
@@ -66,16 +62,18 @@ class Mooberry_Story_Community_Story_Collection {
 
 
 		$story_objects = array();
+		global $mbdsc_story_factory;
 		foreach ( $story_ids as $story ) {
-			$story_objects[] = new Mooberry_Story_Community_Story(intval($story));
+			$story_objects[] = $mbdsc_story_factory->create_story(intval($story));
 		}
 		return $story_objects;
 	}
 
 	protected static function get_story_objects( $stories ){
 		$story_objects = array();
+		global $mbdsc_story_factory;
 		foreach ( $stories as $story ) {
-			$story_objects[] = new Mooberry_Story_Community_Story(intval($story->ID));
+			$story_objects[] = $mbdsc_story_factory->create_story(intval($story->ID));
 		}
 		return $story_objects;
 	}

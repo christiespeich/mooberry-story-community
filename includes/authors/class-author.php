@@ -13,7 +13,7 @@ class Mooberry_Story_Community_Author extends Mooberry_Story_Community_Post_Obje
 		$author_id = 0;
 		$wp_user = get_user_by( 'ID', $user_id );
 		$author_posts = get_posts( array( 'post_type'=>'mbdsc_author', 'title'=>$wp_user->user_login, 'fields'=>'ids', 'post_status' => 'publish') );
-		if (  is_array($author_posts) ) {
+		if (  is_array($author_posts) && count($author_posts) > 0) {
 			$author_id = $author_posts[0];
 		}
 		$this->user_id = intval($user_id);

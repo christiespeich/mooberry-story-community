@@ -95,7 +95,9 @@ class Mooberry_Story_Community_Review_CPT extends Mooberry_Story_Community_CPT {
 	}
 
 	public function get_stories() {
-		$stories = Mooberry_Story_Community_Story_Collection::get_all_published_stories();
+		global $mbdsc_story_factory;
+		//$stories = Mooberry_Story_Community_Factory_Generator::create_story_factory()->create_story_collection()::get_all_published_stories();
+		$stories = $mbdsc_story_factory->create_story_collection()::get_all_published_stories();
 		$story_list       = array( '' => '' );
 		foreach ( $stories as $story ) {
 			$story_list[ $story->id ] = $story->title;
@@ -105,7 +107,8 @@ class Mooberry_Story_Community_Review_CPT extends Mooberry_Story_Community_CPT {
 	}
 
 	public function get_chapters() {
-		$stories = Mooberry_Story_Community_Chapter_Collection::get_all_published_chapters();
+		global $mbdsc_chapter_factory;
+		$stories = $mbdsc_chapter_factory->create_chapter_collection()::get_all_published_chapters();
 		$story_list       = array( '' => '' );
 		foreach ( $stories as $story ) {
 			$story_list[ $story->id ] = $story->title;
@@ -213,7 +216,8 @@ class Mooberry_Story_Community_Review_CPT extends Mooberry_Story_Community_CPT {
 		$content = isset( $_POST['content'] ) ? $_POST['content'] : '';
 
 		if ( $chapter_id != 0 && $email != '' && $content != '' & $name != '' ) {
-			$chapter = new Mooberry_Story_Community_Chapter( $chapter_id );
+			global $mbdsc_chapter_factory;
+			$chapter = $mbdsc_chapter_factory->create_chapter( $chapter_id );
 			$new_review_id = wp_insert_post(array( 'post_title' => $chapter->title . ' by ' . $email, 'post_status'=>'publish', 'post_type'=>$this->post_type) );
 			if ( $new_review_id != 0 ) {
 				update_post_meta( $new_review_id, 'mbdsc_review_chapter', $chapter_id);
@@ -228,7 +232,8 @@ class Mooberry_Story_Community_Review_CPT extends Mooberry_Story_Community_CPT {
 				Submitted: October 5, 2020 12:28 pm
 				Review:
 				*/
-				$story = new Mooberry_Story_Community_Story( $chapter->story_id );
+				global $mbdsc_story_factory;
+				$story = $mbdsc_story_factory->create_story( $chapter->story_id );
 				$chapter_title = $chapter->title;
 				$story_title = $story->title;
 				 $author_email = $story->author->user->user_email;

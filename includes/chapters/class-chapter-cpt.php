@@ -114,7 +114,9 @@ class Mooberry_Story_Community_Chapter_CPT extends Mooberry_Story_Community_CPT 
 		global $post;
 
 
-		$stories          = Mooberry_Story_Community_Story_Collection::get_stories_by_user( get_post_field( 'post_author', $post->ID ) );
+		//$stories          = Mooberry_Story_Community_Factory_Generator::create_story_factory()->create_story_collection()::get_stories_by_user( get_post_field( 'post_author', $post->ID ) );
+		global $mbdsc_story_factory;
+		$stories = $mbdsc_story_factory->create_story_collection()::get_stories_by_user( get_post_field( 'post_author', $post->ID ) );
 		$story_list       = array( '' => '' );
 		foreach ( $stories as $story ) {
 			$story_list[ $story->id ] = $story->title;
@@ -223,7 +225,8 @@ JOIN {$wpdb->posts} as p2 on p2.ID=pm.meta_value";
 
 			$story_id = $a['value'];
 
-			$chapters = Mooberry_Story_Community_Chapter_Collection::get_chapters_by_story( $story_id );
+			global $mbdsc_chapter_factory;
+			$chapters = $mbdsc_chapter_factory->create_chapter_factory()::get_chapters_by_story( $story_id );
 
 			update_post_meta( $a['id'], '_mbdsc_chapter_order', count( $chapters ) + 1 );
 

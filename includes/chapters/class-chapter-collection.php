@@ -56,8 +56,10 @@ class Mooberry_Story_Community_Chapter_Collection {
 
 
 		$chapter_objects = array();
+		global $mbdsc_chapter_factory;
 		foreach ( $chapters as $chapter ) {
-			$chapter_objects[] = new Mooberry_Story_Community_Chapter( $chapter->ID );
+
+			$chapter_objects[] = $mbdsc_chapter_factory->create_chapter( $chapter->ID );
 		}
 
 		return $chapter_objects;
@@ -70,8 +72,9 @@ class Mooberry_Story_Community_Chapter_Collection {
 
 	protected static function get_chapter_objects( $chapters ){
 		$chapter_objects = array();
+		global $mbdsc_chapter_factory;
 		foreach ( $chapters as $chapter ) {
-			$chapter_objects[] = new Mooberry_Story_Community_Chapter( $chapter->ID );
+			$chapter_objects[] = $mbdsc_chapter_factory->create_chapter( $chapter->ID );
 		}
 
 		return $chapter_objects;

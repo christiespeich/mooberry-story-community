@@ -49,8 +49,9 @@ class Mooberry_Story_Community_Review_Collection {
 
 	protected static function get_review_objects( $reviews ){
 		$review_objects = array();
+		global $mbdsc_review_factory;
 		foreach ( $reviews as $review ) {
-			$review_objects[] = new Mooberry_Story_Community_Review(intval($review->ID));
+			$review_objects[] = $mbdsc_review_factory->create_review(intval($review->ID));
 		}
 		return $review_objects;
 	}

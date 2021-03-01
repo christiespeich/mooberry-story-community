@@ -33,11 +33,12 @@ class Mooberry_Story_Community_Chapter extends Mooberry_Story_Community_Post_Obj
 	protected function load ( $id, $custom_fields ) {
 		parent::load( $id, $custom_fields );
 		if ( $this->post ) {
+			global $mbdsc_review_factory;
 			$this->body = $this->post->post_content;
 			$this->story_id = get_post_meta( $id, 'mbdsc_chapter_story', true );
 			$this->order = get_post_meta( $id, '_mbdsc_chapter_order', true );
 			$this->word_count = $this->count_words();
-			$this->reviews = Mooberry_Story_Community_Review_Collection::get_reviews_by_chapter($this->id);
+			$this->reviews = $mbdsc_review_factory->create_review_collection()::get_reviews_by_chapter($this->id);
 
 		}
 	}

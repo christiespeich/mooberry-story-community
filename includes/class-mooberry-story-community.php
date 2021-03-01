@@ -70,7 +70,7 @@ class Mooberry_Story_Community {
 		$this->perform_updates();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
-		$this->register_cpts();
+		//$this->register_cpts();
 
 	}
 
@@ -111,6 +111,13 @@ class Mooberry_Story_Community {
 		 */
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/class-mooberry-story-community-public.php';
 
+		// factories
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-story-factory.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/authors/class-author-factory.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter-factory.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/reviews/class-review-factory.php';
+		//require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/class-factory-generator.php';
+
 
 		// settings
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'admin/setting-pages/class-settings-page.php';
@@ -140,6 +147,7 @@ class Mooberry_Story_Community {
 
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-story.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-story-collection.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-list-display.php';
 
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter-collection.php';
@@ -152,6 +160,11 @@ class Mooberry_Story_Community {
 
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-updated-stories-widget.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-taxonomy-widget.php';
+
+		$mbdsc_story_factory = new Mooberry_Story_Community_Story_Factory();
+		$mbdsc_author_factory = new Mooberry_Story_Community_Author_Factory();
+		$mbdsc_chapter_factory = new Mooberry_Story_Community_Chapter_Factory();
+		$mbdsc_review_factory = new Mooberry_Story_Community_Review_Factory();
 	}
 
 	/**
@@ -203,8 +216,12 @@ class Mooberry_Story_Community {
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_scripts' ) );
 
+		add_action( 'init', array( $this, 'register_cpts'));
+
 		add_action( 'admin_init', array( $plugin_admin, 'flush_rewrite_rules' ) );
 		add_action( 'cmb2_admin_init', array( $plugin_admin, 'register_options_metabox' ) );
+
+
 
 	}
 
@@ -248,15 +265,31 @@ class Mooberry_Story_Community {
 		add_shortcode( 'mbdsc_reviews', array( $plugin_public, 'shortcode_chapter_reviews' ) );
 		add_shortcode( 'mbdsc_review', array( $plugin_public, 'shortcode_review' ) );
 		add_shortcode( 'mbdsc_review_count', array( $plugin_public, 'shortcode_chapter_review_count' ) );
+		add_shortcode( 'mbdsc_story_review_count', array( $plugin_public, 'shortcode_story_review_count' ) );
+		add_shortcode( 'mbdsc_chapter_count', array( $plugin_public, 'shortcode_chapter_count' ) );
+
 
 	}
 
 
-	private function register_cpts() {
-		$story   = new Mooberry_Story_Community_Story_CPT();
-		$chapter = new Mooberry_Story_Community_Chapter_CPT();
-		$user    = new Mooberry_Story_Community_Author_CPT();
-		$review  = new Mooberry_Story_Community_Review_CPT();
+	public function register_cpts() {
+		//$story   = new Mooberry_Story_Community_Story_CPT();
+		//$story = Mooberry_Story_Community_Factory_Generator::create_story_factory()->create_story_cpt();
+		global $mbdsc_story_factory, $mbdsc_author_factory, $mbdsc_chapter_factory, $mbdsc_review_factory;
+		$mbdsc_story_factory = apply_filters( 'mbdsc_story_factory', new Mooberry_Story_Community_Story_Factory());
+		$mbdsc_author_factory = apply_filters( 'mbdsc_author_factory', new Mooberry_Story_Community_Author_Factory());
+		$mbdsc_chapter_factory = apply_filters( 'mbdsc_chapter_factory', new Mooberry_Story_Community_Chapter_Factory());
+		$mbdsc_review_factory = apply_filters( 'mbdsc_review_factory', new Mooberry_Story_Community_Review_Factory());
+
+		$story = $mbdsc_story_factory->create_story_cpt();
+		$chapter = $mbdsc_chapter_factory->create_chapter_cpt();
+		$user    = $mbdsc_author_factory->create_author_cpt();
+		$review  = $mbdsc_review_factory->create_review_cpt();
+
+		$story->register();
+		$chapter->register();
+		$user->register();
+		$review->register();
 	}
 
 

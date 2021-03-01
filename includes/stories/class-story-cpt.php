@@ -79,8 +79,8 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 		echo '<p>' . __( 'Drag and drop the items to reorder them.', 'mooberry-story' ) . '</p>';
 		echo '	<ol id="mbdsc_chapter_list">';
 
-
-		$chapters           = Mooberry_Story_Community_Chapter_Collection::get_chapters_by_story( $post->ID );
+		global $mbdsc_chapter_factory;
+		$chapters = $mbdsc_chapter_factory->create_chapter_collection()::get_chapters_by_story( $post->ID );
 		foreach ( $chapters as $chapter ) {
 			echo '<img class="mbdsc_chapter_delete_icon" id="mbdsc_chapter_delete_icon_' . $chapter->id . '" src="' . MOOBERRY_STORY_COMMUNITY_PLUGIN_URL . 'assets/delete.png" data-chapter_id="' . $chapter->id . '"/><li id="mbdsc_chapter_' . $chapter->id . '" class="ui-state-default"><span class="ui-icon"></span> <div class="mbdsc_chapter_title" id="mbdsc_chapter_title_' . $chapter->id . '" >' . $chapter->title . '</div><a href="' . $chapter->link . '" target="_new"><img class="mbdsc_chapter_preview_icon" src="' . MOOBERRY_STORY_COMMUNITY_PLUGIN_URL . 'assets/new_window_icon.png"/></a><img class="mbdsc_chapter_list_edit" id="mbdbsc_chapter_edit_' . $chapter->id . '" src="' . MOOBERRY_STORY_COMMUNITY_PLUGIN_URL . 'assets/edit.png" data-chapter_id="' . $chapter->id . '"/>
 </li>';
@@ -89,10 +89,14 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 		echo '</ol>';
 
 		ob_start();
-		wp_editor( htmlspecialchars(''), 'mbdsc_chapter_text', array('textarea_name'=>'mbdsc_chapter_text',   'media_buttons'=>false, 'editor_height' => 200) );
+		wp_editor( htmlspecialchars( '' ), 'mbdsc_chapter_text', array(
+			'textarea_name' => 'mbdsc_chapter_text',
+			'media_buttons' => false,
+			'editor_height' => 200
+		) );
 		$editor = ob_get_clean();
 
-	echo '	<div id="mbdsc_chapter_dialog" title="Edit Chapter" style="display:none" >
+		echo '	<div id="mbdsc_chapter_dialog" title="Edit Chapter" style="display:none" >
 	<div id="mbdsc_chapter_form_error" style="display:none;">Sorry, an error has occurred. Please try again later.</div>
 	<div id="mbdsc_chapter_form">
   <p class="validateTips">All form fields are required.</p>
@@ -100,7 +104,7 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 
       <label for="title">Title</label>
       <input type="text" name="mbdsc_chapter_title" id="mbdsc_chapter_title" value="" class="text ui-widget-content ui-corner-all" style="width:100%">
-      ' .  $editor . '<input type="hidden" id="mbdsc_edit_chapter_id">
+      ' . $editor . '<input type="hidden" id="mbdsc_edit_chapter_id">
 
       <!-- Allow form submission with keyboard without duplicating the dialog button -->
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
@@ -146,7 +150,8 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 
 
 		$chapter_id = wp_kses_post( $_POST['chapter']);
-		$chapter = new Mooberry_Story_Community_Chapter( $chapter_id );
+		global $mbdsc_chapter_factory;
+		$chapter = $mbdsc_chapter_factory->create_chapter( $chapter_id );
 		echo json_encode(array('title'=> $chapter->title, 'body'=>$chapter->body));
 		wp_die();
 	}
@@ -181,7 +186,8 @@ function save_chapter() {
 				'post_author'   =>  get_post_field('post_author', $story_id)
 			) );
 			update_post_meta( $new_chapter_id, 'mbdsc_chapter_story', $story_id );
-						$chapters = Mooberry_Story_Community_Chapter_Collection::get_chapters_by_story( $story_id );
+			global $mbdsc_chapter_factory;
+			$chapters = $mbdsc_chapter_factory->create_chapter_collection()::get_chapters_by_story( $story_id );
 
 			update_post_meta( $new_chapter_id, '_mbdsc_chapter_order', count( $chapters ) + 1 );
 			$link = get_permalink($new_chapter_id);
@@ -245,9 +251,10 @@ function save_chapter() {
 	function display_custom_columns( $column, $post_id ) {
 		parent::display_custom_columns( $column, $post_id );
 
-		$story = new Mooberry_Story_Community_Story($post_id);
+		global $mbdsc_story_factory, $mbdsc_chapter_factory;
+		$story = $mbdsc_story_factory->create_story($post_id);
 		if ( $column == 'chapter_count') {
-            echo Mooberry_Story_Community_Chapter_Collection::get_chapter_count_for_story( $post_id );
+            echo $mbdsc_chapter_factory->create_chapter_collection()::get_chapter_count_for_story( $post_id );
         }
 		if ( $column == 'complete' ) {
 
@@ -325,7 +332,7 @@ function save_chapter() {
 	public function create_metaboxes() {
 
 
-		$story_meta_box = new_cmb2_box( apply_filters( 'mbdsc_story_meta_box', array(
+		$this->metaboxes['mbdsc_story_meta_box'] = new_cmb2_box( apply_filters( 'mbdsc_story_meta_box', array(
 			'id'           => 'mbdsc_story_meta_box',
 			'title'        => __( 'About the Story', 'mooberry-story-community' ),
 			'object_types' => array( $this->post_type ), // Post type
@@ -334,14 +341,14 @@ function save_chapter() {
 			'show_names'   => true, // Show field names on the left
 		) ) );
 
-			$story_meta_box->add_field( apply_filters( 'mbdsc_story_complete_field', array(
+			$this->metaboxes['mbdsc_story_meta_box']->add_field( apply_filters( 'mbdsc_story_complete_field', array(
 			'name'       => __( 'Story Is Complete?', 'mooberry-story-community' ),
 			'id'         => 'mbdsc_story_complete',
 			'type'       => 'checkbox',
 		) ) );
 
 
-		$story_meta_box->add_field( apply_filters( 'mbdsc_story_summary_field', array(
+		$this->metaboxes['mbdsc_story_meta_box']->add_field( apply_filters( 'mbdsc_story_summary_field', array(
 			'name'    => __( 'Story Summary', 'mooberry-story-community' ),
 			'id'      => 'mbdsc_story_summary',
 			'type'    => 'wysiwyg',
@@ -361,7 +368,7 @@ function save_chapter() {
 			),
 		) ) );
 
-	$story_meta_box->add_field( apply_filters( 'mbdsc_story_chapter_titles_field', array(
+	$this->metaboxes['mbdsc_story_meta_box']->add_field( apply_filters( 'mbdsc_story_chapter_titles_field', array(
 			'name'       => __( 'How are Chapters Titled?', 'mooberry-story-community' ),
 			'id'         => 'mbdsc_story_chapter_titles',
 			'type'       => 'radio',
@@ -371,8 +378,9 @@ function save_chapter() {
 
 
 
+
 		$custom_fields = Mooberry_Story_Community_Custom_Fields_Settings::get_custom_story_fields();
-        $this->add_custom_fields($custom_fields, $story_meta_box );
+        $this->add_custom_fields($custom_fields, $this->metaboxes['mbdsc_story_meta_box'] );
 
 
 		/*$chapters_metabox =  new_cmb2_box( apply_filters('mbdsc_story_chapters_meta_box', array(
@@ -385,7 +393,7 @@ function save_chapter() {
 		) ) );*/
 
 
-		$cover_image_meta_box = new_cmb2_box( apply_filters( 'mbdsc_story_cover_image_meta_box', array(
+		$this->metaboxes['mbdsc_story_cover_image_meta_box'] = new_cmb2_box( apply_filters( 'mbdsc_story_cover_image_meta_box', array(
 			'id'           => 'mbdsc_cover_image',
 			'title'        => __( 'Story Cover', 'mooberry-story-community' ),
 			'object_types' => array( $this->post_type ), // Post type
@@ -394,7 +402,7 @@ function save_chapter() {
 			'show_names'   => false, // Show field names on the left
 		) ) );
 
-		$cover_image_meta_box->add_field( apply_filters( 'mbdsc_story_cover_image_field', array(
+		$this->metaboxes['mbdsc_story_cover_image_meta_box']->add_field( apply_filters( 'mbdsc_story_cover_image_field', array(
 			'name'   => __( 'Story Cover', 'mooberry-story-community' ),
 			'id'     => 'mbdsc_story_cover',
 			'type'   => 'file',
@@ -415,7 +423,7 @@ function save_chapter() {
 
 			if ( ! current_user_can( 'add_' . $taxonomy->taxonomy . '_terms' ) ) {
 
-				$metabox = new_cmb2_box( array(
+				$this->metaboxes[$taxonomy->taxonomy . '_taxonomy_metabox'] = new_cmb2_box( array(
 						'id'           => $taxonomy->taxonomy . '_taxonomy_metabox',
 						'title'        => $taxonomy->singular_name,
 						'object_types' => array( $this->post_type, ),
@@ -449,7 +457,7 @@ function save_chapter() {
 					$args['attributes'] = array( 'required' => 'required' );
 				}
 
-				$metabox->add_field( $args );
+				$this->metaboxes[$taxonomy->taxonomy . '_taxonomy_metabox']->add_field( $args );
 
 			}
 		}

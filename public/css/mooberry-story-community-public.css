@@ -3,6 +3,28 @@
  * included in this file.
  */
 
+.mbdsc_story_list {
+    padding-bottom: 3em;
+    display: inline-block;
+    width: 100%;
+
+}
+
+.mbdsc_story_list .mbdsc_story_review_count, .mbdsc_story_list .mbdsc_story_chapter_count, .mbdsc_story_list .mbdsc_story_complete {
+  display: inline;
+  font-size: smaller;
+  color: gray;
+
+}
+
+.mbdsc_story_list .mbdsc_cover_image {
+  float: left;
+  margin-right: 5em;
+}
+
+.mbdsc_story_list hr {
+  margin-bottom: 0;
+}
 
 
 /* Story Page */
@@ -13,7 +35,7 @@
     max-height: 350px;
 }
 
-.mbdsc_story_complete_label, .mbdsc_story_word_count_label, .mbdsc_story_custom_field_label, .mbdsc_story_taxonomy_label {
+.mbdsc_story_complete_label, .mbdsc_story_word_count_label, .mbdsc_story_custom_field_label, .mbdsc_story_taxonomy_label, .mbdsc_story_review_count_label, .mbdsc_story_chapter_count_label {
     font-weight: bold;
 }
 
@@ -131,10 +153,4 @@ ul.mbdsc_taxonomy_menu ul.children {
 .mbdsc_author_pic_profile_page {
     width: 100px;
     float: left;
-}
-.mbdsc_author_page_story {
-    padding-bottom: 3em;
-    display: inline-block;
-    width: 100%;
-
 }

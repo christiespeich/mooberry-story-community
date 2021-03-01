@@ -53,7 +53,7 @@ jQuery(document)
 		      })
 
 	  jQuery('.mbdsc_chapter_delete_icon')
-		.on('click', mbdsc_delete_chapter)
+		.on('click', mbdsc_delete_chapter_click)
 
 	  jQuery('[id^="mbdbsc_chapter_edit_"]')
 		.on('click', mbdsc_edit_chapter)
@@ -91,7 +91,7 @@ jQuery(document)
 
   })
 
-function mbdsc_delete_chapter (event) {
+function mbdsc_delete_chapter_click (event) {
 	if (confirm('Are you sure you want to delete this chapter?')) {
 
 		var chapter = jQuery(this)

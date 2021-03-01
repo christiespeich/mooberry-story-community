@@ -12,6 +12,7 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Objec
 	protected $cover;
 	protected $cover_id;
 	protected $word_count;
+	protected $total_reviews;
 
 
 	public function __construct( $id = 0 ) {
@@ -33,23 +34,25 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Objec
 		$this->cover       = '';
 		$this->cover_id    = 0;
 		$this->word_count = 0;
+		$this->total_reviews = 0;
 
 	}
 
 	protected function load( $id, $custom_fields ) {
 		parent::load( $id, $custom_fields);
 
-
-		$this->author = new Mooberry_Story_Community_Author( $this->author_id );
+		global $mbdsc_author_factory, $mbdsc_chapter_factory;
+		$this->author = $mbdsc_author_factory->create_author( $this->author_id );
 
 		$this->summary =  get_post_meta( $this->id, 'mbdsc_story_summary', true );
 		$this->cover    = get_post_meta( $this->id, 'mbdsc_story_cover', true );
 		$this->cover_id = get_post_meta( $this->id, 'mbdsc_story_cover_id', true );
 		$this->is_complete = get_post_meta( $this->id, 'mbdsc_story_complete', true ) === "on";
 
-		$this->chapters = Mooberry_Story_Community_Chapter_Collection::get_chapters_by_story($this->id);
+		$this->chapters = $mbdsc_chapter_factory->create_chapter_collection()::get_chapters_by_story($this->id);
 		foreach ( $this->chapters as $chapter ) {
 			$this->word_count = $this->word_count + $chapter->word_count;
+			$this->total_reviews = $this->total_reviews + count($chapter->reviews);
 		}
 
 
@@ -68,9 +71,15 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Objec
 			}
 			$this->taxonomies[ $taxonomy->slug ] = $tax;
 		}
+	}
 
 
-
+	public function get_chapter_link ( $chapter_number ) {
+		// chapter_number - 1 so 1 can be passed in for 1st chapter, etc.
+			if ( isset( $this->chapters[$chapter_number - 1 ] ) ) {
+				return $this->chapters[ $chapter_number - 1 ]->link;
+			}
+			return '';
 	}
 
 	public function get_next_chapter( $chapter_id ) {
