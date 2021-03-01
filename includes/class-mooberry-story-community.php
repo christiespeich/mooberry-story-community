@@ -161,6 +161,8 @@ class Mooberry_Story_Community {
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-updated-stories-widget.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/widgets/class-taxonomy-widget.php';
 
+		require_once( MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . '/includes/vendor/mooberry-dreams/software-licensing.php' );
+
 		$mbdsc_story_factory = new Mooberry_Story_Community_Story_Factory();
 		$mbdsc_author_factory = new Mooberry_Story_Community_Author_Factory();
 		$mbdsc_chapter_factory = new Mooberry_Story_Community_Chapter_Factory();
