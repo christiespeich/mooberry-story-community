@@ -1,10 +1,10 @@
 === Mooberry Story Community ===
 Contributors: mooberrydreams
 Donate link: http://www.mooberrydreams.com
-Tags: comments, spam
+Tags: authors, writing, stories, blog, community, fan fiction, fiction, writers
 Requires at least: 3.8.0
 Tested up to: 5.6
-Stable tag: 0.11
+Stable tag: 0.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,6 +28,9 @@ Creates a multi-author story sharing site
 == Screenshots ==
 
 == Changelog ==
+
+= 0.12 =
+* Prep for Community Story Pro
 
 = 0.11 =
 * Added: Display number of stories next to author name
