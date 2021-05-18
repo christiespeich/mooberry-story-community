@@ -13,6 +13,7 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Objec
 	protected $cover_id;
 	protected $word_count;
 	protected $total_reviews;
+	protected $show_numbers_on_toc;
 
 
 	public function __construct( $id = 0 ) {
@@ -35,6 +36,7 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Objec
 		$this->cover_id    = 0;
 		$this->word_count = 0;
 		$this->total_reviews = 0;
+		$this->show_numbers_on_toc = true;
 
 	}
 
@@ -48,6 +50,7 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Objec
 		$this->cover    = get_post_meta( $this->id, 'mbdsc_story_cover', true );
 		$this->cover_id = get_post_meta( $this->id, 'mbdsc_story_cover_id', true );
 		$this->is_complete = get_post_meta( $this->id, 'mbdsc_story_complete', true ) === "on";
+		$this->show_numbers_on_toc = get_post_meta( $this->id, 'mbdsc_show_numbers_on_toc', true ) === "on";
 
 		$this->chapters = $mbdsc_chapter_factory->create_chapter_collection()::get_chapters_by_story($this->id);
 		foreach ( $this->chapters as $chapter ) {

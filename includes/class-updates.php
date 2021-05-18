@@ -82,6 +82,7 @@ class Mooberry_Story_Community_Updates {
 
 		$this->run_update( '0.3' );
 		$this->run_update( '0.9' );
+		$this->run_update( '0.13' );
 
 	}
 
@@ -167,6 +168,13 @@ class Mooberry_Story_Community_Updates {
 					) );
 				}
 			}
+		}
+	}
+
+	private function update_to_0_13() {
+		$stories = get_posts( array ('post_type' => 'mbdsc_story', 'posts_per_page' => -1) );
+		foreach ( $stories as $story ) {
+			update_post_meta( $story->ID, 'mbdsc_show_numbers_on_toc', 'on');
 		}
 	}
 }

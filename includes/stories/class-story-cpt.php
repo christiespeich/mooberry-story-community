@@ -376,6 +376,12 @@ function save_chapter() {
 			'custom'=>__('Allow me to set chapter titles', 'mooberry-story-community') )
 		) ) );
 
+	$this->metaboxes['mbdsc_story_meta_box']->add_field( apply_filters( 'mbdsc_show_numbers_on_toc_field', array(
+			'name'       => __( 'Show List Numbers on Table of Contents Page?', 'mooberry-story-community' ),
+			'id'         => 'mbdsc_show_numbers_on_toc',
+			'type'       => 'checkbox',
+		) ) );
+
 
 
 

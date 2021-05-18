@@ -385,7 +385,8 @@ global $mbdsc_chapter_factory;
 			$content = '<div class="mbdsc_toc"><h2 class="mbdsc_toc_title">' . __( 'Table of Contents', 'mooberry-story-community' ) . '</h2>';
 
 
-			$content  .= '</div><ol class="mbdsc_toc_list">';
+			$list_class = $story->show_numbers_on_toc ? '' : 'mbdsc_hide_numbers';
+			$content  .= '</div><ol class="mbdsc_toc_list ' . $list_class . '">';
 			$chapters = $story->chapters;
 			foreach ( $chapters as $chapter ) {
 

@@ -43,6 +43,9 @@
     line-height: 2.5em;
 }
 
+.mbdsc_hide_numbers {
+  list-style: none !important;
+}
 
 /* Chapter Page */
 .mbdsc_toc_link {
