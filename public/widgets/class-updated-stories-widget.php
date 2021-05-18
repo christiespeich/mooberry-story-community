@@ -28,7 +28,7 @@ class Mooberry_Story_Community_Updated_Stories_Widget extends WP_Widget {
 			$mbds_story_limit = $instance['mbds_story_limit'];
 
 		} else {
-			$mbds_sw_story_limit = '10';
+			$mbds_story_limit = '10';
 			$mbds_sw_title = '';
 
 		}
