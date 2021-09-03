@@ -27,8 +27,10 @@
  * @subpackage Mooberry_Story_Community/includes
  * @author     Mooberry Dreams <support@mooberrydreams.com>
  */
-class Mooberry_Story_Community {
+final class Mooberry_Story_Community {
 
+
+	private static $instance;
 
 	/**
 	 * The unique identifier of this plugin.
@@ -48,30 +50,53 @@ class Mooberry_Story_Community {
 	 */
 	protected $version;
 
+	public $current_user;
+
 	/**
-	 * Define the core functionality of the plugin.
+	 * Main Mooberry_Book_Manager_Book_Shop Instance
+	 *
+	 * Insures that only one instance of Mooberry_Book_Manager_Book_Shop exists in memory at any one
+	 * time. Also prevents needing to define globals all over the place.
+	 *
+	 *  * Define the core functionality of the plugin.
 	 *
 	 * Set the plugin name and the plugin version that can be used throughout the plugin.
 	 * Load the dependencies, define the locale, and set the hooks for the admin area and
 	 * the public-facing side of the site.
 	 *
 	 * @since    1.0.0
+	 *
 	 */
-	public function __construct() {
-		if ( defined( 'MOOBERRY_STORY_COMMUNITY_VERSION' ) ) {
-			$this->version = MOOBERRY_STORY_COMMUNITY_VERSION;
-		} else {
-			$this->version = '1.0.0';
+	public static function instance() {
+		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Mooberry_Story_Community ) ) {
+			self::$instance = new Mooberry_Story_Community;
+
+			if ( defined( 'MOOBERRY_STORY_COMMUNITY_VERSION' ) ) {
+				self::$instance->version = MOOBERRY_STORY_COMMUNITY_VERSION;
+			} else {
+				self::$instance->version = '1.0.0';
+			}
+			self::$instance->plugin_name = 'mooberry-story-community';
+
+			self::$instance->load_dependencies();
+			self::$instance->set_locale();
+			self::$instance->perform_updates();
+			self::$instance->define_admin_hooks();
+			self::$instance->define_public_hooks();
+
+			add_action( 'init', array( self::$instance, 'set_current_user') );
+
+
 		}
-		$this->plugin_name = 'mooberry-story-community';
+		return self::$instance;
+	}
 
-		$this->load_dependencies();
-		$this->set_locale();
-		$this->perform_updates();
-		$this->define_admin_hooks();
-		$this->define_public_hooks();
-		//$this->register_cpts();
-
+	public function set_current_user() {
+		global $mbdsc_reader_factory;
+		if ( is_user_logged_in()) {
+			$user_id = get_current_user_id();
+			self::$instance->current_user  = $mbdsc_reader_factory->create_reader( $user_id );
+		}
 	}
 
 	/**
@@ -113,6 +138,7 @@ class Mooberry_Story_Community {
 
 		// factories
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/stories/class-story-factory.php';
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/readers/class-reader-factory.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/authors/class-author-factory.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter-factory.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/reviews/class-review-factory.php';
@@ -152,6 +178,10 @@ class Mooberry_Story_Community {
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/chapters/class-chapter-collection.php';
 
+		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/readers/class-reader.php';
+		//require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/authors/class-reader-cpt.php';
+
+
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/authors/class-author.php';
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/authors/class-author-cpt.php';
 
@@ -164,9 +194,13 @@ class Mooberry_Story_Community {
 		require_once( MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . '/includes/vendor/mooberry-dreams/software-licensing.php' );
 
 		$mbdsc_story_factory = new Mooberry_Story_Community_Story_Factory();
+		$mbdsc_reader_factory = new Mooberry_Story_Community_Reader_Factory();
 		$mbdsc_author_factory = new Mooberry_Story_Community_Author_Factory();
 		$mbdsc_chapter_factory = new Mooberry_Story_Community_Chapter_Factory();
 		$mbdsc_review_factory = new Mooberry_Story_Community_Review_Factory();
+
+
+
 	}
 
 	/**
@@ -198,7 +232,7 @@ class Mooberry_Story_Community {
 
 		require_once MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'includes/class-updates.php';
 
-		$plugin_updates = new Mooberry_Story_Community_Updates( $this->version );
+		$plugin_updates = new Mooberry_Story_Community_Updates( self::$instance->version );
 
 		add_action( 'init', array( $plugin_updates, 'check_for_updates' ), 99 );
 
@@ -213,7 +247,7 @@ class Mooberry_Story_Community {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Mooberry_Story_Community_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Mooberry_Story_Community_Admin( self::get_plugin_name(), self::get_version() );
 
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_scripts' ) );
@@ -236,7 +270,7 @@ class Mooberry_Story_Community {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Mooberry_Story_Community_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Mooberry_Story_Community_Public( self::get_plugin_name(), self::get_version() );
 
 		add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_scripts' ) );
@@ -245,9 +279,12 @@ class Mooberry_Story_Community {
 
 		add_action( 'user_register', array( $plugin_public, 'add_new_user' ), 10, 1 );
 
+		add_action( 'wp_ajax_mbdsc_reload_favorite_stories', array( $plugin_public, 'reload_favorite_stories'));
+
 
 		// shortcodes
 		add_shortcode( 'mbdsc_title', array( $plugin_public, 'shortcode_title' ) );
+		add_shortcode( 'mbdsc_fave_story_stars', array( $plugin_public, 'shortcode_fave_story_stars' ) );
 		add_shortcode( 'mbdsc_author', array( $plugin_public, 'shortcode_author' ) );
 		add_shortcode( 'mbdsc_cover', array( $plugin_public, 'shortcode_cover' ) );
 		add_shortcode( 'mbdsc_summary', array( $plugin_public, 'shortcode_summary' ) );
@@ -269,6 +306,9 @@ class Mooberry_Story_Community {
 		add_shortcode( 'mbdsc_review_count', array( $plugin_public, 'shortcode_chapter_review_count' ) );
 		add_shortcode( 'mbdsc_story_review_count', array( $plugin_public, 'shortcode_story_review_count' ) );
 		add_shortcode( 'mbdsc_chapter_count', array( $plugin_public, 'shortcode_chapter_count' ) );
+		add_shortcode( 'mbdsc_story_list_item', array( $plugin_public, 'shortcode_story_list_item' ) );
+		add_shortcode( 'mbdsc_user_profile', array( $plugin_public, 'shortcode_user_profile' ) );
+
 
 
 	}
@@ -277,11 +317,12 @@ class Mooberry_Story_Community {
 	public function register_cpts() {
 		//$story   = new Mooberry_Story_Community_Story_CPT();
 		//$story = Mooberry_Story_Community_Factory_Generator::create_story_factory()->create_story_cpt();
-		global $mbdsc_story_factory, $mbdsc_author_factory, $mbdsc_chapter_factory, $mbdsc_review_factory;
+		global $mbdsc_story_factory, $mbdsc_author_factory, $mbdsc_chapter_factory, $mbdsc_review_factory, $mbdsc_reader_factory;
 		$mbdsc_story_factory = apply_filters( 'mbdsc_story_factory', new Mooberry_Story_Community_Story_Factory());
 		$mbdsc_author_factory = apply_filters( 'mbdsc_author_factory', new Mooberry_Story_Community_Author_Factory());
 		$mbdsc_chapter_factory = apply_filters( 'mbdsc_chapter_factory', new Mooberry_Story_Community_Chapter_Factory());
 		$mbdsc_review_factory = apply_filters( 'mbdsc_review_factory', new Mooberry_Story_Community_Review_Factory());
+		$mbdsc_reader_factory = apply_filters( 'mbdsc_reader_factory', new Mooberry_Story_Community_Reader_Factory());
 
 		$story = $mbdsc_story_factory->create_story_cpt();
 		$chapter = $mbdsc_chapter_factory->create_chapter_cpt();
@@ -303,7 +344,7 @@ class Mooberry_Story_Community {
 	 * @since     1.0.0
 	 */
 	public function get_plugin_name() {
-		return $this->plugin_name;
+		return self::$instance->plugin_name;
 	}
 
 	/**
@@ -313,7 +354,7 @@ class Mooberry_Story_Community {
 	 * @since     1.0.0
 	 */
 	public function get_version() {
-		return $this->version;
+		return self::$instance->version;
 	}
 
 }

@@ -1,8 +1,5 @@
 jQuery(document).ready(function () {
 
-
-
-
     jQuery('ul.mbdsc_taxonomy_menu span.mbdsc_taxonomy_menu_toggle').on('click', function() {
         jQuery(this).parent().children('ul.children').toggle(250);
         jQuery(this).toggleClass('mbdsc_taxonomy_menu_closed');
@@ -13,6 +10,10 @@ jQuery(document).ready(function () {
 
 
     jQuery('#mbdsc_review_submit').on('click', mbdsc_submit_review );
+
+  jQuery('.mbdsc_fave_story_star').on('click', mbdsc_toggle_fave_story_status );
+
+  jQuery( "#mbdsc_user_profile_tabs" ).tabs();
 
 });
 
@@ -80,3 +81,64 @@ function mbdsc_submit_review( e ) {
     }
 
 }
+
+function mbdsc_toggle_fave_story_status(e ) {
+  e.preventDefault();
+
+  var story_id = jQuery(this)
+    .data('story');
+
+  jQuery('.mbdsc_fave_story_star[data-story="' + story_id + '"] i')
+    .addClass('fa-spin');
+  var data = {
+    'action': 'mbdsc_toggle_fave_story_status',
+    'story_id': story_id,
+    'security': mbdsc_public_ajax_object.mbdsc_public_security,
+  };
+
+  var mbdsc_toggle_fave_story_status = jQuery.post(mbdsc_public_ajax_object.ajax_url, data);
+
+  mbdsc_toggle_fave_story_status.done(function (data) {
+
+    jQuery('.mbdsc_fave_story_star[data-story="' + data + '"]')
+      .toggle();
+    //Class('fa-star').toggleClass('fa-star-o');
+
+    /*var label;
+   if (    jQuery('.mbdbbs_fave_author_star[data-author="' + data + '"] i').attr('title' ) == 'This author is on your favorites list. Click to remove them.' ) {
+       label = 'This author is not on your favorites list. Click to add them.';
+   } else {
+       label = 'This author is on your favorites list. Click to remove them.';
+   }
+   jQuery('.mbdbbs_fave_author_star[data-author="' + data + '"]').attr('aria-label', label);
+   jQuery('.mbdbbs_fave_author_star[data-author="' + data + '"] i').attr('title', label);
+*/
+
+  });
+
+  mbdsc_toggle_fave_story_status.always(function (result) {
+
+    jQuery('.mbdsc_fave_story_star[data-story="' + result + '"] i')
+      .removeClass('fa-spin');
+
+    jQuery('div#mbdsc_favorite_stories').fadeOut("slow");
+
+    // reload fave stories if needed
+    var data = {
+      'action': 'mbdsc_reload_favorite_stories',
+      'security': mbdsc_public_ajax_object.mbdsc_public_security,
+    };
+    var mbdsc_reload_favorite_stories = jQuery.post(mbdsc_public_ajax_object.ajax_url, data);
+    mbdsc_reload_favorite_stories.done(function (data) {
+
+      jQuery('div#mbdsc_favorite_stories').html(data);
+
+    });
+    mbdsc_reload_favorite_stories.always(function (data) {
+      jQuery('div#mbdsc_favorite_stories')
+        .fadeIn("slow");
+    });
+  });
+
+}
+

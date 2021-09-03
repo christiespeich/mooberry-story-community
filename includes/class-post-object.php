@@ -11,6 +11,7 @@ class Mooberry_Story_Community_Post_Object {
 	protected $custom_fields;
 	protected $link;
 	protected $slug;
+	protected $post_type;
 
 
 		public function __construct( $id = 0, $custom_fields = array() ) {

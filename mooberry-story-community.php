@@ -122,10 +122,13 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-mooberry-story-community.p
  *
  * @since    1.0.0
  */
-function run_mooberry_story_community() {
+function MBDSC() {
 
-	$plugin = new Mooberry_Story_Community();
+	return Mooberry_Story_Community::instance();
 }
 
+function run_mooberry_story_community() {
+	MBDSC();
+}
 
 run_mooberry_story_community();

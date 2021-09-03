@@ -69,6 +69,24 @@ class Mooberry_Story_Community_Chapter_Collection {
 		return count( self::get_chapters_by_story( $story_id ) );
 	}
 
+	public static function get_chapters_updated_since( $timestamp ) {
+		$chapters = self::get(array(
+			'post_status'=>'publish',
+			 'date_query' => array(
+			 	'relation' => 'OR',
+        array(
+            'column' => 'post_date_gmt',
+            'after' => $timestamp,
+        ),
+        array(
+            'column' => 'post_modified_gmt',
+            'after'  => $timestamp,
+        ),
+    ),
+			));
+		return self::get_chapter_objects($chapters);
+	}
+
 
 	protected static function get_chapter_objects( $chapters ){
 		$chapter_objects = array();

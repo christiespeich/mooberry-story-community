@@ -31,7 +31,7 @@ class Mooberry_Story_Community_Deactivator {
 	 */
 	public static function deactivate() {
 
-
+/*
 		$story_cpt   = new Mooberry_Story_Community_Story_CPT();
 		$chapter_cpt = new Mooberry_Story_Community_Chapter_CPT();
 		$review_cpt  = new Mooberry_Story_Community_Review_CPT();
@@ -44,7 +44,7 @@ class Mooberry_Story_Community_Deactivator {
 		//remove_role(MOOBERRY_STORY_COMMUNITY_ROLE_MODERATOR);
 		remove_role( MOOBERRY_STORY_COMMUNITY_ROLE_AUTHOR );
 		//remove_role(MOOBERRY_STORY_COMMUNITY_ROLE_MODERATED_AUTHOR);
-		remove_role( MOOBERRY_STORY_COMMUNITY_ROLE_READER );
+		remove_role( MOOBERRY_STORY_COMMUNITY_ROLE_READER );*/
 	}
 
 }

@@ -24,9 +24,10 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 					'assign_terms' => 'assign_' . $custom_taxonomy->taxonomy . '_terms',
 				),
 				'hierarchical' => $custom_taxonomy->is_hierarchical,
-				'rewrite'      => array( 'slug'         => strtolower( sanitize_text_field( $this->plural_name ) ) . '/' . $custom_taxonomy->slug,
-				                         'with_front'   => false,
-				                         'hierarchical' => $custom_taxonomy->is_hierarchical
+				'rewrite'      => array(
+					'slug'         => strtolower( sanitize_text_field( $this->plural_name ) ) . '/' . $custom_taxonomy->slug,
+					'with_front'   => false,
+					'hierarchical' => $custom_taxonomy->is_hierarchical
 				)
 
 			) );
@@ -53,7 +54,10 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 		add_action( 'wp_ajax_get_chapter', array( $this, 'get_chapter' ) );
 		add_action( 'wp_ajax_mbdsc_delete_chapter', array( $this, 'delete_chapter' ) );
 		add_filter( 'the_content', array( $this, 'content' ) );
+		add_filter( 'the_title', array( $this, 'title' ) );
 
+		add_action( 'wp_ajax_mbdsc_toggle_fave_story_status', array( $this, 'toggle_fave_story_status') );
+		add_action( 'wp_ajax_nopriv_mbdsc_toggle_fave_story_status', array( $this, 'toggle_fave_story_status') );
 
 	}
 
@@ -67,7 +71,7 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 
 		// Start with an underscore to hide fields from custom fields list
 
-		add_meta_box(  '_mbds_posts_meta_box', __( 'Chapters', 'mooberry-story' ), array(
+		add_meta_box( '_mbds_posts_meta_box', __( 'Chapters', 'mooberry-story' ), array(
 			$this,
 			'mbds_posts_meta_box'
 		), 'mbdsc_story', 'normal',
@@ -115,20 +119,20 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 	}
 
 	function delete_chapter() {
-				$nonce = $_POST['security'];
+		$nonce = $_POST['security'];
 
 
 		// check to see if the submitted nonce matches with the
 		// generated nonce we created earlier
-		if (  ! wp_verify_nonce( $nonce, 'mbdsc_story_cpt_ajax_nonce' ) ) {
+		if ( ! wp_verify_nonce( $nonce, 'mbdsc_story_cpt_ajax_nonce' ) ) {
 			echo 'ERROR';
 			die ();
 		}
 
 
-		$chapter_id = wp_kses_post( $_POST['chapter']);
-		$result = wp_trash_post( $chapter_id );
-		if ( !isset($result) || $result === false ) {
+		$chapter_id = wp_kses_post( $_POST['chapter'] );
+		$result     = wp_trash_post( $chapter_id );
+		if ( ! isset( $result ) || $result === false ) {
 			echo false;
 		} else {
 			echo true;
@@ -138,44 +142,44 @@ class Mooberry_Story_Community_Story_CPT extends Mooberry_Story_Community_CPT {
 	}
 
 	function get_chapter() {
-				$nonce = $_POST['security'];
+		$nonce = $_POST['security'];
 
 
 		// check to see if the submitted nonce matches with the
 		// generated nonce we created earlier
-		if (  ! wp_verify_nonce( $nonce, 'mbdsc_story_cpt_ajax_nonce' ) ) {
+		if ( ! wp_verify_nonce( $nonce, 'mbdsc_story_cpt_ajax_nonce' ) ) {
 			echo 'ERROR';
 			die ();
 		}
 
 
-		$chapter_id = wp_kses_post( $_POST['chapter']);
+		$chapter_id = wp_kses_post( $_POST['chapter'] );
 		global $mbdsc_chapter_factory;
 		$chapter = $mbdsc_chapter_factory->create_chapter( $chapter_id );
-		echo json_encode(array('title'=> $chapter->title, 'body'=>$chapter->body));
+		echo json_encode( array( 'title' => $chapter->title, 'body' => $chapter->body ) );
 		wp_die();
 	}
 
 
-function save_chapter() {
-			$nonce = $_POST['security'];
+	function save_chapter() {
+		$nonce = $_POST['security'];
 
 
 		// check to see if the submitted nonce matches with the
 		// generated nonce we created earlier
-		if (  ! wp_verify_nonce( $nonce, 'mbdsc_story_cpt_ajax_nonce' ) ) {
+		if ( ! wp_verify_nonce( $nonce, 'mbdsc_story_cpt_ajax_nonce' ) ) {
 			die ();
 		}
 
 
-		$story_id = intval($_POST['story']);
-		$title = sanitize_text_field($_POST['title']);
-		$chapter = wp_kses_post( $_POST['chapter']);
+		$story_id = intval( $_POST['story'] );
+		$title    = sanitize_text_field( $_POST['title'] );
+		$chapter  = wp_kses_post( $_POST['chapter'] );
 
-		$chapter_id = isset($_POST['chapter_id']) ? intval($_POST['chapter_id']) : 0;
+		$chapter_id = isset( $_POST['chapter_id'] ) ? intval( $_POST['chapter_id'] ) : 0;
 
 		$new_chapter_id = 0;
-		$link = '';
+		$link           = '';
 		if ( $chapter_id == 0 ) {
 
 			$new_chapter_id = wp_insert_post( array(
@@ -183,30 +187,36 @@ function save_chapter() {
 				'post_title'   => $title,
 				'post_type'    => 'mbdsc_chapter',
 				'post_status'  => 'publish',
-				'post_author'   =>  get_post_field('post_author', $story_id)
+				'post_author'  => get_post_field( 'post_author', $story_id )
 			) );
 			update_post_meta( $new_chapter_id, 'mbdsc_chapter_story', $story_id );
 			global $mbdsc_chapter_factory;
 			$chapters = $mbdsc_chapter_factory->create_chapter_collection()::get_chapters_by_story( $story_id );
 
 			update_post_meta( $new_chapter_id, '_mbdsc_chapter_order', count( $chapters ) + 1 );
-			$link = get_permalink($new_chapter_id);
+			$link = get_permalink( $new_chapter_id );
+
+			do_action( 'mbdsc_new_chapter_save', $new_chapter_id, $story_id);
+			do_action( 'mbdsc_chapter_save', $new_chapter_id, $story_id, 'new');
 
 		} else {
 			wp_update_post( array(
-				'ID'    => $chapter_id,
+				'ID'           => $chapter_id,
 				'post_content' => $chapter,
 				'post_title'   => $title,
 				'post_type'    => 'mbdsc_chapter',
 				'post_status'  => 'publish',
 
 			) );
+			do_action( 'mbdsc_updated_chapter_save', $chapter_id, $story_id);
+			do_action( 'mbdsc_chapter_save', $chapter_id, $story_id, 'updated');
 		}
 
 
-		echo json_encode( array('new_chapter_id' => $new_chapter_id, 'new_chapter_url' => $link));
+		echo json_encode( array( 'new_chapter_id' => $new_chapter_id, 'new_chapter_url' => $link ) );
 		wp_die();
-}
+	}
+
 	function save_chapters_order() {
 
 		$nonce = $_POST['security'];
@@ -234,17 +244,18 @@ function save_chapter() {
 		}
 
 	}
-	function set_custom_columns( $columns ) {
-	   $author = $columns['author'];
-	   $date = $columns['date'];
-	   unset ($columns['author']);
-	   unset ($columns['date']);
-	   $columns['chapter_count'] = __('Number of Chapters', 'mooberry-story-community');
-	   $columns['complete'] = __('Story is Complete?', 'mooberry-story-community');
-	   $columns['author'] = $author;
-	   $columns['date'] = $date;
 
-	   return $columns;
+	function set_custom_columns( $columns ) {
+		$author = $columns['author'];
+		$date   = $columns['date'];
+		unset ( $columns['author'] );
+		unset ( $columns['date'] );
+		$columns['chapter_count'] = __( 'Number of Chapters', 'mooberry-story-community' );
+		$columns['complete']      = __( 'Story is Complete?', 'mooberry-story-community' );
+		$columns['author']        = $author;
+		$columns['date']          = $date;
+
+		return $columns;
 
 	}
 
@@ -252,14 +263,14 @@ function save_chapter() {
 		parent::display_custom_columns( $column, $post_id );
 
 		global $mbdsc_story_factory, $mbdsc_chapter_factory;
-		$story = $mbdsc_story_factory->create_story($post_id);
-		if ( $column == 'chapter_count') {
-            echo $mbdsc_chapter_factory->create_chapter_collection()::get_chapter_count_for_story( $post_id );
-        }
+		$story = $mbdsc_story_factory->create_story( $post_id );
+		if ( $column == 'chapter_count' ) {
+			echo $mbdsc_chapter_factory->create_chapter_collection()::get_chapter_count_for_story( $post_id );
+		}
 		if ( $column == 'complete' ) {
 
-		    //$complete = get_post_meta( $post_id, 'mbdsc_story_complete', true);
-			echo $story->is_complete ?  __( 'Yes', 'mooberry-story-community' ) : __( 'No', 'mooberry-story-community' );
+			//$complete = get_post_meta( $post_id, 'mbdsc_story_complete', true);
+			echo $story->is_complete ? __( 'Yes', 'mooberry-story-community' ) : __( 'No', 'mooberry-story-community' );
 		}
 	}
 
@@ -286,7 +297,7 @@ function save_chapter() {
 
 			$slug = $post->post_name;
 
-			$content =  '[mbdsc_author story="' . $slug . '" byline="yes"]';
+			$content = '[mbdsc_author story="' . $slug . '" byline="yes"]';
 
 			$content .= '[mbdsc_cover story="' . $slug . '"]';
 
@@ -320,13 +331,13 @@ function save_chapter() {
 		global $post;
 		$slug = $post->post_name;
 
-			$content = '[mbdsc_author byline="yes" story="' . $slug . '"]';
+		$content = '[mbdsc_author byline="yes" story="' . $slug . '"]';
 
-			$content .= '[mbdsc_summary story="' . $slug . '"]';
+		$content .= '[mbdsc_summary story="' . $slug . '"]';
 
-			$content .= '[mbdsc_cover link="yes" story="' . $slug . '"]';
+		$content .= '[mbdsc_cover link="yes" story="' . $slug . '"]';
 
-			return $content;
+		return $content;
 	}
 
 	public function create_metaboxes() {
@@ -341,10 +352,10 @@ function save_chapter() {
 			'show_names'   => true, // Show field names on the left
 		) ) );
 
-			$this->metaboxes['mbdsc_story_meta_box']->add_field( apply_filters( 'mbdsc_story_complete_field', array(
-			'name'       => __( 'Story Is Complete?', 'mooberry-story-community' ),
-			'id'         => 'mbdsc_story_complete',
-			'type'       => 'checkbox',
+		$this->metaboxes['mbdsc_story_meta_box']->add_field( apply_filters( 'mbdsc_story_complete_field', array(
+			'name' => __( 'Story Is Complete?', 'mooberry-story-community' ),
+			'id'   => 'mbdsc_story_complete',
+			'type' => 'checkbox',
 		) ) );
 
 
@@ -368,25 +379,25 @@ function save_chapter() {
 			),
 		) ) );
 
-	$this->metaboxes['mbdsc_story_meta_box']->add_field( apply_filters( 'mbdsc_story_chapter_titles_field', array(
-			'name'       => __( 'How are Chapters Titled?', 'mooberry-story-community' ),
-			'id'         => 'mbdsc_story_chapter_titles',
-			'type'       => 'radio',
-		'options'   =>  array('auto'=>__('Automatically number chapters: Chapter 1, Chapter 2, etc.', 'mooberry-story-community') ,
-			'custom'=>__('Allow me to set chapter titles', 'mooberry-story-community') )
+		$this->metaboxes['mbdsc_story_meta_box']->add_field( apply_filters( 'mbdsc_story_chapter_titles_field', array(
+			'name'    => __( 'How are Chapters Titled?', 'mooberry-story-community' ),
+			'id'      => 'mbdsc_story_chapter_titles',
+			'type'    => 'radio',
+			'options' => array(
+				'auto'   => __( 'Automatically number chapters: Chapter 1, Chapter 2, etc.', 'mooberry-story-community' ),
+				'custom' => __( 'Allow me to set chapter titles', 'mooberry-story-community' )
+			)
 		) ) );
 
-	$this->metaboxes['mbdsc_story_meta_box']->add_field( apply_filters( 'mbdsc_show_numbers_on_toc_field', array(
-			'name'       => __( 'Show List Numbers on Table of Contents Page?', 'mooberry-story-community' ),
-			'id'         => 'mbdsc_show_numbers_on_toc',
-			'type'       => 'checkbox',
+		$this->metaboxes['mbdsc_story_meta_box']->add_field( apply_filters( 'mbdsc_show_numbers_on_toc_field', array(
+			'name' => __( 'Show List Numbers on Table of Contents Page?', 'mooberry-story-community' ),
+			'id'   => 'mbdsc_show_numbers_on_toc',
+			'type' => 'checkbox',
 		) ) );
-
-
 
 
 		$custom_fields = Mooberry_Story_Community_Custom_Fields_Settings::get_custom_story_fields();
-        $this->add_custom_fields($custom_fields, $this->metaboxes['mbdsc_story_meta_box'] );
+		$this->add_custom_fields( $custom_fields, $this->metaboxes['mbdsc_story_meta_box'] );
 
 
 		/*$chapters_metabox =  new_cmb2_box( apply_filters('mbdsc_story_chapters_meta_box', array(
@@ -429,7 +440,7 @@ function save_chapter() {
 
 			if ( ! current_user_can( 'add_' . $taxonomy->taxonomy . '_terms' ) ) {
 
-				$this->metaboxes[$taxonomy->taxonomy . '_taxonomy_metabox'] = new_cmb2_box( array(
+				$this->metaboxes[ $taxonomy->taxonomy . '_taxonomy_metabox' ] = new_cmb2_box( array(
 						'id'           => $taxonomy->taxonomy . '_taxonomy_metabox',
 						'title'        => $taxonomy->singular_name,
 						'object_types' => array( $this->post_type, ),
@@ -463,7 +474,7 @@ function save_chapter() {
 					$args['attributes'] = array( 'required' => 'required' );
 				}
 
-				$this->metaboxes[$taxonomy->taxonomy . '_taxonomy_metabox']->add_field( $args );
+				$this->metaboxes[ $taxonomy->taxonomy . '_taxonomy_metabox' ]->add_field( $args );
 
 			}
 		}
@@ -477,7 +488,7 @@ function save_chapter() {
 			'read',
 			'read_' . $plural,
 			'read_' . $single,
-            'read_others'
+			'read_others'
 		) );
 
 		$this->moderated_author_level = apply_filters( 'mbdsc_moderated_author_level_capabilities', array(
@@ -514,4 +525,45 @@ function save_chapter() {
 
 	}
 
+
+
+	public function title( $title ) {
+		// this weeds out content in the sidebar and other odd places
+		// thanks joeytwiddle for this update
+		if ( ! in_the_loop() || ! is_main_query() ) {
+			return $title;
+		}
+
+		if ( get_post_type() !== $this->post_type ) {
+			return $title;
+		}
+
+		// if it's a story page, add the star next to title if user logged in
+		if ( is_single() && ! is_admin() ) {
+			global $post;
+
+			return $title . ' ' . do_shortcode('[mbdsc_fave_story_stars story="' . $post->ID . '" ]');
+		}
+		return $title;
+	}
+
+	public function toggle_fave_story_status( ) {
+		$nonce = $_POST['security'];
+		if (  ! wp_verify_nonce( $nonce, 'mbdsc_public_ajax_nonce' ) ) {
+			die ();
+		}
+
+		$story_id = isset($_POST['story_id']) ? intval($_POST['story_id']) : 0;
+		$user_id = get_current_user_id();
+
+		if ( $story_id == 0 || $user_id == 0 ) {
+			die();
+		}
+		global $mbdsc_reader_factory;
+
+		$reader = $mbdsc_reader_factory->create_reader($user_id);
+		$reader->toggle_favorite_story($story_id);
+		echo $story_id;
+		wp_die();
+	}
 }

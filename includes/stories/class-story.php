@@ -26,8 +26,8 @@ class Mooberry_Story_Community_Story extends Mooberry_Story_Community_Post_Objec
 	protected function init( ) {
 		parent::init();
 
-
-		$this->author  = null;
+		global $mbdsc_author_factory;
+		$this->author  = $mbdsc_author_factory->create_author(0 );
 		$this->summary     = '';
 		$this->chapters    = array();
 		$this->is_complete = false;

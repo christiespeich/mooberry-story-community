@@ -64,6 +64,9 @@ class Mooberry_Story_Community_Public {
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/mooberry-story-community-public.css', array(), $this->version, 'all' );
 
+		$file = 'assets/font-awesome-4.7.0/css/font-awesome.min.css';
+		wp_enqueue_style( 'mbdsc-font-awesome', MOOBERRY_STORY_COMMUNITY_PLUGIN_URL . $file );
+
 	}
 
 	/**
@@ -81,6 +84,7 @@ class Mooberry_Story_Community_Public {
 
 		) );
 
+		wp_enqueue_script( 'jquery-ui-tabs' );
 	}
 
 	public function add_new_user( $user_id ) {
@@ -123,32 +127,34 @@ class Mooberry_Story_Community_Public {
 
 	}
 
-	public static  function get_story_from_shortcode_atts( $story = 0 ) {
+	public static function get_story_from_shortcode_atts( $story = 0 ) {
 		$story_id = self::get_post_id_from_shortcode_atts( 'mbdsc_story', $story );
 
 		//return new Mooberry_Story_Community_Story( $story_id );
 		//return Mooberry_Story_Community_Factory_Generator::create_story_factory()->create_story( $story_id);
 		global $mbdsc_story_factory;
-		return $mbdsc_story_factory->create_story($story_id);
+
+		return $mbdsc_story_factory->create_story( $story_id );
 
 
 	}
 
-	public static  function get_chapter_from_shortcode_atts( $chapter = 0 ) {
+	public static function get_chapter_from_shortcode_atts( $chapter = 0 ) {
 		$chapter_id = self::get_post_id_from_shortcode_atts( 'mbdsc_chapter', $chapter );
-global $mbdsc_chapter_factory;
+		global $mbdsc_chapter_factory;
+
 		return $mbdsc_chapter_factory->create_chapter( $chapter_id );
 
 	}
 
-	public static  function get_review_from_shortcode_atts( $review = 0 ) {
+	public static function get_review_from_shortcode_atts( $review = 0 ) {
 		$review_id = self::get_post_id_from_shortcode_atts( 'mbdsc_review', $review );
 		global $mbdsc_review_factory;
 
 		return $mbdsc_review_factory->create_review( $review_id );
 	}
 
-	public static  function get_author_from_shortcode_atts( $author = 0 ) {
+	public static function get_author_from_shortcode_atts( $author = 0 ) {
 
 		$author_id = 0;
 		if ( $author == 0 ) {
@@ -165,11 +171,12 @@ global $mbdsc_chapter_factory;
 			}
 		}
 		global $mbdsc_author_factory;
+
 		return $mbdsc_author_factory->create_author( $author_id );
 	}
 
 
-	public static  function get_story_from_chapter( $story = 0 ) {
+	public static function get_story_from_chapter( $story = 0 ) {
 		// either a specific story has been passed in
 		// or we need to figure out the story based on the chapter, which is the current $post
 
@@ -188,11 +195,67 @@ global $mbdsc_chapter_factory;
 
 	}
 
+	protected function get_favorite_stories_list() {
+		$stories = is_user_logged_in() ? MBDSC()->current_user->get_favorite_stories() : array();
+		//$list    = new Mooberry_Story_Community_Story_List_Display( $stories );
+
+		$content = '';
+		foreach ( $stories as $story ) {
+			$content .= '[mbdsc_story_list_item story="' . $story->slug . '" cover_height="100px" context="favorite_stories"]';
+		}
+
+		return do_shortcode( $content );
+		//return $list->display( array( 'cover_height' => '100px' ) );
+	}
+
+	public function reload_favorite_stories() {
+		$nonce = $_POST['security'];
+		if ( ! wp_verify_nonce( $nonce, 'mbdsc_public_ajax_nonce' ) ) {
+			die ();
+		}
+
+		echo $this->get_favorite_stories_list();
+		wp_die();
+
+	}
+
+	public function shortcode_fave_story_stars( $atts, $content ) {
+		$atts = shortcode_atts( array(
+			'story' => null,
+		), $atts );
+
+		$story = self::get_story_from_shortcode_atts( $atts['story'] );
+
+		$mbdsc_reader_factory = new Mooberry_Story_Community_Reader_Factory();
+		$add_visibility       = 'none';
+		$remove_visibility    = 'none';
+
+
+		if ( is_user_logged_in() ) {
+			$user_id = get_current_user_id();
+			$reader  = $mbdsc_reader_factory->create_reader( $user_id );
+			if ( $reader->is_favorite_story( $story->id ) ) {
+				$remove_visibility = 'inline-block';
+			} else {
+				$add_visibility = 'inline-block';
+			}
+
+		}
+		$add_label = __( 'Add this story from your favorites', 'mooberry-story-community' );
+		$add_star  = ' <a href="#" aria-label="' . $add_label . '" class="mbdsc_fave_story_star" data-story="' . $story->id . '" style="display: ' . $add_visibility . '" ><i id="mbdscp_add_story_star" class="fa fa-star-o " aria-hidden="true" title="' . $add_label . '"></i></a>';
+
+		$remove_label = __( 'Remove this story to your favorites', 'mooberry-story-community' );
+		$remove_star  = ' <a href="#" aria-label="' . $remove_label . '" class="mbdsc_fave_story_star" data-story="' . $story->id . '" style="display: ' . $remove_visibility . '" ><i id="mbdscp_remove_story_star" class="fa fa-star " aria-hidden="true" title="' . $remove_label . '"></i></a>';
+
+		return $add_star . $remove_star;
+	}
+
 	public function shortcode_title( $atts, $content ) {
 
 		$atts  = shortcode_atts( array(
-			'story' => null,
-			'link'  => 'yes',
+			'story'      => null,
+			'link'       => 'yes',
+			'fave_stars' => 'yes'
 		), $atts );
 		$story = self::get_story_from_shortcode_atts( $atts['story'] );
 		if ( $story ) {
@@ -200,7 +263,9 @@ global $mbdsc_chapter_factory;
 			if ( $atts['link'] == 'yes' ) {
 				$content = '<a href="' . $story->link . '">' . $content . '</a>';
 			}
-
+			if ( $atts['fave_stars'] == 'yes' ) {
+				$content .= do_shortcode( '[mbdsc_fave_story_stars story="' . $story->id . '" ]' );
+			}
 
 		}
 
@@ -208,14 +273,14 @@ global $mbdsc_chapter_factory;
 	}
 
 	public function shortcode_author( $atts, $content ) {
-		$atts  = shortcode_atts( array(
+		$atts = shortcode_atts( array(
 			'story'  => null,
 			'author' => null,
 			'byline' => 'no',
 		), $atts );
 		if ( $atts['story'] != null ) {
 			$story = self::get_story_from_shortcode_atts( $atts['story'] );
-			if ( $story) {
+			if ( $story ) {
 				$author = $story->author;
 			}
 		}
@@ -236,12 +301,21 @@ global $mbdsc_chapter_factory;
 
 	public function shortcode_cover( $atts, $content ) {
 		$atts  = shortcode_atts( array(
-			'story' => null,
-			'link'  => 'no',
+			'story'  => null,
+			'link'   => 'no',
+			'height' => '',
+			'width'  => '',
 		), $atts );
 		$story = self::get_story_from_shortcode_atts( $atts['story'] );
+
+		$height = $atts['height'] != '' ? 'height: ' . $atts['height'] . ';' : '';
+		$width  = $atts['width'] != '' ? 'width: ' . $atts['width'] . ';' : '';
+
+
+		$style = "style='$height $width'";
+
 		if ( $story ) {
-			$content = '<img class="mbdsc_cover_image" src="' . esc_attr( $story->cover ) . '">';
+			$content = '<img class="mbdsc_cover_image" ' . $style . ' src="' . esc_attr( $story->cover ) . '">';
 			if ( $atts['link'] == 'yes' ) {
 				$content = '<a href="' . $story->link . '">' . $content . '</a>';
 			}
@@ -359,7 +433,7 @@ global $mbdsc_chapter_factory;
 	}
 
 	public function shortcode_chapter_count( $atts, $content ) {
-			$atts  = shortcode_atts( array(
+		$atts  = shortcode_atts( array(
 			'story' => null,
 		), $atts );
 		$story = self::get_story_from_shortcode_atts( $atts['story'] );
@@ -386,8 +460,8 @@ global $mbdsc_chapter_factory;
 
 
 			$list_class = $story->show_numbers_on_toc ? '' : 'mbdsc_hide_numbers';
-			$content  .= '</div><ol class="mbdsc_toc_list ' . $list_class . '">';
-			$chapters = $story->chapters;
+			$content    .= '</div><ol class="mbdsc_toc_list ' . $list_class . '">';
+			$chapters   = $story->chapters;
 			foreach ( $chapters as $chapter ) {
 
 				$content .= '<li><a class="mbdsc_toc_chapter_link" href="' . esc_attr( $chapter->link ) . '">';
@@ -550,11 +624,14 @@ global $mbdsc_chapter_factory;
 
 		//$stories = Mooberry_Story_Community_Factory_Generator::create_story_factory()->create_story_collection()::get_stories_by_user( $author->user_id );
 		global $mbdsc_story_factory;
-		$stories = $mbdsc_story_factory->create_story_collection()::get_stories_by_user( $author->user_id );
-		$list_display = $mbdsc_story_factory->create_list_display( $stories );
-		$content = '<div class="mbdsc_author_page_stories">';
-		$content .= $list_display->display();
-		$content .= '</div>';
+		$stories      = $mbdsc_story_factory->create_story_collection()::get_stories_by_user( $author->user_id );
+
+		//$list_display = $mbdsc_story_factory->create_list_display( $stories );
+		$content      = '<div class="mbdsc_author_page_stories">';
+		foreach ( $stories as $story ) {
+			$content .= '[mbdsc_story_list_item story="' . $story->slug . '" context="author_stories"]'; //$list_display->display();
+		}
+		$content      .= '</div>';
 
 		return do_shortcode( apply_filters( 'mbdsc_author_stories_shortcode', $content, $atts ) );
 
@@ -633,7 +710,7 @@ global $mbdsc_chapter_factory;
 
 
 		$story = self::get_story_from_shortcode_atts( $atts['story'] );
-		if ( $story) {
+		if ( $story ) {
 			$content = '<div class="mbdsc_story_review_count">';
 			$content .= '<span class="mbdsc_story_review_count_label">Reviews:</span> <span class="mbdsc_story_review_count_value">';
 			$content .= $story->total_reviews . '</span></div>';
@@ -642,6 +719,61 @@ global $mbdsc_chapter_factory;
 		return apply_filters( 'mbdbsc_story_review_count_shortcode', $content, $atts );
 	}
 
+
+	public function shortcode_story_list_item( $atts, $content ) {
+		$atts = shortcode_atts( array(
+			'story' => null,
+			'cover_height' => '',
+			'context' => '',
+		), $atts );
+$story = self::get_story_from_shortcode_atts( $atts['story'] );
+		if ( $story ) {
+			$cover_height = $atts['cover_height'];
+			$content      = '';
+
+				$content .= apply_filters( 'mbdsc_list_display_before_item', $content, $story, $atts);
+				$content .= '<div class="mbdsc_story_list_item">';
+				$content = apply_filters( 'mbdsc_list_display_before_title', $content, $story, $atts );
+				$content .= '<h2 class="entry-title">[mbdsc_title link-"yes" story="' . $story->slug . '"]</h2>';
+				$content = apply_filters( 'mbdsc_list_display_before_author', $content, $story, $atts);
+				$content .= '[mbdsc_author byline="yes" story="' . $story->slug . '"]';
+				$content .= '<div class="entry-content" >';
+				$content = apply_filters( 'mbdsc_list_display_before_cover', $content, $story, $atts );
+				$content .= '<div class="mbdsc_story_list_item_cover">';
+				$content .= '[mbdsc_cover link="yes" story="' . $story->slug . '" height="' . $cover_height . '"]';
+				$content .= '</div>';
+				$content = apply_filters( 'mbdsc_list_display_before_summary', $content, $story, $atts);
+				$content .= '<div class="mbdsc_story_list_item_info">';
+				$content .= '[mbdsc_summary story="' . $story->slug . '"]';
+				$content .= '<p><a href="' . $story->get_chapter_link( 1 ) . '">' . __( 'Read now...', 'mooberry-story-community' ) . '</a></p>';
+				$content = apply_filters( 'mbdsc_list_display_after_summary', $content, $story, $atts );
+				$content .= '<hr>';
+				$content = apply_filters( 'mbdsc_list_display_before_counts', $content, $story, $atts );
+				$content .= '[mbdsc_chapter_count story="' . $story->slug . '"] | [mbdsc_story_review_count story="' . $story->slug . '"] | [mbdsc_complete story="' . $story->slug . '"]';
+				$content = apply_filters( 'mbdsc_list_display_after_counts', $content, $story, $atts );
+				$content .= '</div> <!-- mbsc_story_list_item_info -->';
+				$content .= '</div> <!-- entry-content -->';
+				$content .= '</div> <!-- mbdsc_story_list_item -->';
+
+		}
+		return do_shortcode( apply_filters( 'mbdbsc_story_list_item_shortcode', $content, $atts ) );
+	}
+
+	public function shortcode_user_profile( $atts, $content ) {
+		/*$atts = shortcode_atts( array(
+			'story' => null,
+		), $atts );*/
+
+
+		$favorite_stories_list = $this->get_favorite_stories_list();
+
+		ob_start();
+		include MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/partials/user-profile.php';
+		$content = ob_get_clean();
+
+		return $content;
+
+	}
 }
 /*
 

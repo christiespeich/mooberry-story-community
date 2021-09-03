@@ -14,8 +14,4 @@ class Mooberry_Story_Community_Story_Factory {
 	public function create_story_collection() {
 		return new Mooberry_Story_Community_Story_Collection();
 	}
-
-	public function create_list_display( $stories ) {
-		return new Mooberry_Story_Community_Story_List_Display( $stories );
-	}
 }
