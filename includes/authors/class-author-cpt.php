@@ -27,6 +27,7 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 		$this->set_up_role_levels();
 		add_filter( 'the_content', array( $this, 'content' ) );
 		add_filter( 'the_title', array( $this, 'title' ), 10, 2 );
+		add_filter( 'the_posts', array( $this, 'filter_author_archive'), 10,2 );
 
 
 	}
@@ -39,7 +40,10 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 			//$stories = Mooberry_Story_Community_Factory_Generator::create_story_factory()->create_story_collection()::get_stories_by_user($author->user_id);
 			global $mbdsc_story_factory;
 			$stories = $mbdsc_story_factory->create_story_collection()::get_stories_by_user($author->user_id);
-			$title = $author->display_name . ' (' . count($stories) . ' stories)';
+			$title = $author->display_name . ' (' . count($stories) . ' ' .  _n( 'story', 'stories', count($stories), 'mooberry-story-community' ) . ')';
+
+
+
 		}
 		return $title;
 	}
@@ -126,10 +130,10 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 			return $content;
 		}
 
-		if ( is_archive() ) {
-			//return $this->get_archive_content( $content );
+	/*	if ( is_archive() ) {
+			return $this->get_archive_content( $content );
 		}
-
+*/
 
 		// if it's a story page, show the TOC
 		if ( is_single() && ! is_admin() ) {
@@ -145,4 +149,18 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 		return apply_filters( 'mbdsc_author_archive_content', $content );
 	}
 
+	public function filter_author_archive( $posts, $query ) {
+		if ( !is_admin() && $query->is_main_query() ) {
+			if ( $query->is_post_type_archive && $query->query['post_type'] == $this->post_type ) {
+				$posts_to_keep = array();
+				foreach ( $posts as $post ) {
+					if ( count_user_posts($post->post_author, 'mbdsc_story', true) > 0 ) {
+						$posts_to_keep[] = $post;
+					}
+				}
+				return $posts_to_keep;
+			}
+		}
+		return $posts;
+	}
 }
