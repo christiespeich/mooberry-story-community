@@ -25,14 +25,15 @@
 
 }
 
-.mbdsc_story_list_item .mbdsc_cover_image {
+.mbdsc_story_list_item .mbdsc_cover_image, .mbdsc_author_list_item .mbdsc_author_profile_pic img {
   float: left;
   margin-right: 2em;
 }
 
-.mbdsc_story_list_item hr {
+.mbdsc_story_list_item hr, .mbdsc_author_list_item hr {
   margin-bottom: 0;
   margin-top: 2em;
+  clear: both;
 }
 
 .mbdsc_story_list_item {

@@ -67,6 +67,14 @@ class Mooberry_Story_Community_Public {
 		$file = 'assets/font-awesome-4.7.0/css/font-awesome.min.css';
 		wp_enqueue_style( 'mbdsc-font-awesome', MOOBERRY_STORY_COMMUNITY_PLUGIN_URL . $file );
 
+		wp_enqueue_style('mbdbag-jquery-ui-css-accordion', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css');
+
+		$wp_scripts = wp_scripts();
+	wp_enqueue_style('plugin_name-admin-ui-css',
+                'http://ajax.googleapis.com/ajax/libs/jqueryui/' . $wp_scripts->registered['jquery-ui-core']->ver . '/themes/' . 'smoothness' . '/jquery-ui.css',
+                false,
+                $this->version,
+                false);
 	}
 
 	/**
@@ -76,7 +84,11 @@ class Mooberry_Story_Community_Public {
 	 */
 	public function enqueue_scripts() {
 
-		wp_enqueue_script( $this->plugin_name . '-public', plugin_dir_url( __FILE__ ) . 'js/mooberry-story-community-public.js', array( 'jquery' ), $this->version, false );
+
+		//wp_enqueue_script( 'jquery-ui-tabs' );
+
+
+		wp_enqueue_script( $this->plugin_name . '-public', plugin_dir_url( __FILE__ ) . 'js/mooberry-story-community-public.js', array( 'jquery', 'jquery-ui-tabs' ), $this->version, false );
 
 		wp_localize_script( $this->plugin_name . '-public', 'mbdsc_public_ajax_object', array(
 			'ajax_url'              => admin_url( 'admin-ajax.php' ),
@@ -84,7 +96,10 @@ class Mooberry_Story_Community_Public {
 
 		) );
 
-		wp_enqueue_script( 'jquery-ui-tabs' );
+
+
+
+
 	}
 
 	public function add_new_user( $user_id ) {
@@ -219,13 +234,29 @@ class Mooberry_Story_Community_Public {
 
 	}
 
-	public function shortcode_fave_story_stars( $atts, $content ) {
-		$atts = shortcode_atts( array(
-			'story' => null,
-		), $atts );
+	protected function get_favorite_authors_list() {
+		$authors = is_user_logged_in() ? MBDSC()->current_user->get_favorite_authors() : array();
+		//$list    = new Mooberry_Story_Community_Story_List_Display( $stories );
 
-		$story = self::get_story_from_shortcode_atts( $atts['story'] );
+		$content = '';
+		foreach ( $authors as $author ) {
+			$content .= '[mbdsc_author_list_item author="' . $author->author_id . '" cover_height="100px" context="favorite_authors"]';
+		}
 
+		return do_shortcode( $content );
+		//return $list->display( array( 'cover_height' => '100px' ) );
+	}
+	public function reload_favorite_authors() {
+		$nonce = $_POST['security'];
+		if ( ! wp_verify_nonce( $nonce, 'mbdsc_public_ajax_nonce' ) ) {
+			die ();
+		}
+
+		echo $this->get_favorite_authors_list();
+		wp_die();
+	}
+
+	private function display_fave_star( $author_or_story, $id ) {
 		$mbdsc_reader_factory = new Mooberry_Story_Community_Reader_Factory();
 		$add_visibility       = 'none';
 		$remove_visibility    = 'none';
@@ -234,20 +265,42 @@ class Mooberry_Story_Community_Public {
 		if ( is_user_logged_in() ) {
 			$user_id = get_current_user_id();
 			$reader  = $mbdsc_reader_factory->create_reader( $user_id );
-			if ( $reader->is_favorite_story( $story->id ) ) {
+			$is_favorite = $author_or_story == 'author' ? $reader->is_favorite_author( $id ) : $reader->is_favorite_story( $id ) ;
+			if ($is_favorite) {
 				$remove_visibility = 'inline-block';
 			} else {
 				$add_visibility = 'inline-block';
 			}
 
 		}
-		$add_label = __( 'Add this story from your favorites', 'mooberry-story-community' );
-		$add_star  = ' <a href="#" aria-label="' . $add_label . '" class="mbdsc_fave_story_star" data-story="' . $story->id . '" style="display: ' . $add_visibility . '" ><i id="mbdscp_add_story_star" class="fa fa-star-o " aria-hidden="true" title="' . $add_label . '"></i></a>';
+		$add_label = sprintf( __( 'Add this %s to your favorites', 'mooberry-story-community' ), $author_or_story);
+		$add_star  = ' <a href="#" aria-label="' . $add_label . '" class="mbdsc_fave_' . $author_or_story . '_star" data-' . $author_or_story . '="' . $id . '" style="display: ' . $add_visibility . '" ><i id="mbdscp_add_' . $author_or_story . '_star_' . uniqid() . '" class="fa fa-star-o " aria-hidden="true" title="' . $add_label . '"></i></a>';
 
-		$remove_label = __( 'Remove this story to your favorites', 'mooberry-story-community' );
-		$remove_star  = ' <a href="#" aria-label="' . $remove_label . '" class="mbdsc_fave_story_star" data-story="' . $story->id . '" style="display: ' . $remove_visibility . '" ><i id="mbdscp_remove_story_star" class="fa fa-star " aria-hidden="true" title="' . $remove_label . '"></i></a>';
+		$remove_label = sprintf( __( 'Remove this %s from your favorites', 'mooberry-story-community' ), $author_or_story);
+		$remove_star  = ' <a href="#" aria-label="' . $remove_label . '" class="mbdsc_fave_' . $author_or_story . '_star" data-' . $author_or_story . '="' . $id . '" style="display: ' . $remove_visibility . '" ><i id="mbdscp_remove_' . $author_or_story . '_star_' . uniqid() . '" class="fa fa-star " aria-hidden="true" title="' . $remove_label . '"></i></a>';
 
 		return $add_star . $remove_star;
+	}
+
+	public function shortcode_fave_author_stars( $atts, $content ) {
+			$atts = shortcode_atts( array(
+			'author' => null,
+		), $atts );
+
+		$author = self::get_author_from_shortcode_atts( $atts['author'] );
+
+		return $this->display_fave_star( 'author', $author->author_id );
+
+
+	}
+	public function shortcode_fave_story_stars( $atts, $content ) {
+		$atts = shortcode_atts( array(
+			'story' => null,
+		), $atts );
+
+		$story = self::get_story_from_shortcode_atts( $atts['story'] );
+
+		return $this->display_fave_star( 'story', $story->id );
 	}
 
 	public function shortcode_title( $atts, $content ) {
@@ -277,7 +330,12 @@ class Mooberry_Story_Community_Public {
 			'story'  => null,
 			'author' => null,
 			'byline' => 'no',
+			'fave_stars'   =>  'yes',
 		), $atts );
+
+		if ( $atts['story'] == null && $atts['author'] == null ) {
+			return apply_filters( 'mbdsc_author_shortcode', $content, $atts );
+		}
 		if ( $atts['story'] != null ) {
 			$story = self::get_story_from_shortcode_atts( $atts['story'] );
 			if ( $story ) {
@@ -292,8 +350,12 @@ class Mooberry_Story_Community_Public {
 			if ( $atts['byline'] == 'yes' ) {
 				$content .= '<span class="mbdsc_author_byline">By </span>';
 			}
-			$content .= '<a href="' . $author->link . '">' . $author->display_name . '</a></div>';
+			$content .= '<a href="' . $author->link . '">' . $author->display_name . '</a>';
 
+			if ( $atts['fave_stars'] == 'yes' ) {
+				$content .= do_shortcode( '[mbdsc_fave_author_stars author="' . $author->author_id . '" ]' );
+			}
+			$content .= '</div>';
 		}
 
 		return apply_filters( 'mbdsc_author_shortcode', $content, $atts );
@@ -734,7 +796,7 @@ $story = self::get_story_from_shortcode_atts( $atts['story'] );
 				$content .= apply_filters( 'mbdsc_list_display_before_item', $content, $story, $atts);
 				$content .= '<div class="mbdsc_story_list_item">';
 				$content = apply_filters( 'mbdsc_list_display_before_title', $content, $story, $atts );
-				$content .= '<h2 class="entry-title">[mbdsc_title link-"yes" story="' . $story->slug . '"]</h2>';
+				$content .= '<h2 class="entry-title">[mbdsc_title link="yes" story="' . $story->slug . '"]</h2>';
 				$content = apply_filters( 'mbdsc_list_display_before_author', $content, $story, $atts);
 				$content .= '[mbdsc_author byline="yes" story="' . $story->slug . '"]';
 				$content .= '<div class="entry-content" >';
@@ -759,6 +821,43 @@ $story = self::get_story_from_shortcode_atts( $atts['story'] );
 		return do_shortcode( apply_filters( 'mbdbsc_story_list_item_shortcode', $content, $atts ) );
 	}
 
+	public function shortcode_author_list_item( $atts, $content ) {
+		$atts = shortcode_atts( array(
+			'author' => null,
+			'avatar_height' => '',
+			'context' => '',
+		), $atts );
+		$author = self::get_author_from_shortcode_atts( $atts['author'] );
+		if ( $author ) {
+			$avatar_height = $atts['avatar_height'];
+			$content      = '';
+
+				$content .= apply_filters( 'mbdsc_list_display_before_item', $content, $author, $atts);
+				$content .= '<div class="mbdsc_author_list_item">';
+				$content = apply_filters( 'mbdsc_list_display_before_title', $content, $author, $atts );
+				$content .= '<h2 class="entry-title">[mbdsc_author link="yes" author="' . $author->author_id . '"]</h2>';
+				$content = apply_filters( 'mbdsc_list_display_before_author', $content, $author, $atts);
+				$content .= '<div class="entry-content" >';
+				$content = apply_filters( 'mbdsc_list_display_before_avatar', $content, $author, $atts );
+				$content .= '<div class="mbdsc_author_list_item_avatar">';
+				$content .= '[mbdsc_author_pic link="yes" author="' . $author->author_id . '" height="' . $avatar_height . '"]';
+				$content .= '</div>';
+				$content = apply_filters( 'mbdsc_list_display_before_summary', $content, $author, $atts);
+				$content .= '<div class="mbdsc_author_list_item_info">';
+				$content .= '[mbdsc_author_bio author="' . $author->author_id . '"]';
+				$content = apply_filters( 'mbdsc_list_display_after_summary', $content, $author, $atts );
+				$content .= '<hr>';
+				$content = apply_filters( 'mbdsc_list_display_before_counts', $content, $author, $atts );
+				$content .= 'Stories: ' . count(Mooberry_Story_Community_Story_Collection::get_stories_by_user($author->author_id));
+				$content = apply_filters( 'mbdsc_list_display_after_counts', $content, $author, $atts );
+				$content .= '</div> <!-- mbsc_author_list_item_info -->';
+				$content .= '</div> <!-- entry-content -->';
+				$content .= '</div> <!-- mbdsc_author_list_item -->';
+
+		}
+		return do_shortcode( apply_filters( 'mbdbsc_author_list_item_shortcode', $content, $atts ) );
+	}
+
 	public function shortcode_user_profile( $atts, $content ) {
 		/*$atts = shortcode_atts( array(
 			'story' => null,
@@ -766,6 +865,7 @@ $story = self::get_story_from_shortcode_atts( $atts['story'] );
 
 
 		$favorite_stories_list = $this->get_favorite_stories_list();
+		$favorite_authors_list = $this->get_favorite_authors_list();
 
 		ob_start();
 		include MOOBERRY_STORY_COMMUNITY_PLUGIN_DIR . 'public/partials/user-profile.php';

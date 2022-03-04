@@ -280,12 +280,14 @@ final class Mooberry_Story_Community {
 		add_action( 'user_register', array( $plugin_public, 'add_new_user' ), 10, 1 );
 
 		add_action( 'wp_ajax_mbdsc_reload_favorite_stories', array( $plugin_public, 'reload_favorite_stories'));
+		add_action( 'wp_ajax_mbdsc_reload_favorite_authors', array( $plugin_public, 'reload_favorite_authors'));
 
 
 		// shortcodes
 		add_shortcode( 'mbdsc_title', array( $plugin_public, 'shortcode_title' ) );
 		add_shortcode( 'mbdsc_fave_story_stars', array( $plugin_public, 'shortcode_fave_story_stars' ) );
 		add_shortcode( 'mbdsc_author', array( $plugin_public, 'shortcode_author' ) );
+		add_shortcode( 'mbdsc_fave_author_stars', array( $plugin_public, 'shortcode_fave_author_stars' ) );
 		add_shortcode( 'mbdsc_cover', array( $plugin_public, 'shortcode_cover' ) );
 		add_shortcode( 'mbdsc_summary', array( $plugin_public, 'shortcode_summary' ) );
 		add_shortcode( 'mbdsc_complete', array( $plugin_public, 'shortcode_complete' ) );
@@ -307,6 +309,7 @@ final class Mooberry_Story_Community {
 		add_shortcode( 'mbdsc_story_review_count', array( $plugin_public, 'shortcode_story_review_count' ) );
 		add_shortcode( 'mbdsc_chapter_count', array( $plugin_public, 'shortcode_chapter_count' ) );
 		add_shortcode( 'mbdsc_story_list_item', array( $plugin_public, 'shortcode_story_list_item' ) );
+		add_shortcode( 'mbdsc_author_list_item', array( $plugin_public, 'shortcode_author_list_item' ) );
 		add_shortcode( 'mbdsc_user_profile', array( $plugin_public, 'shortcode_user_profile' ) );
 
 

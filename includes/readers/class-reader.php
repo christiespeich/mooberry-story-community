@@ -41,12 +41,8 @@ class Mooberry_Story_Community_Reader extends Mooberry_Story_Community_Post_Obje
 		$user = get_user_by( 'id', $this->user_id );
 		if ( $user ) {
 			$this->user    = $user;
-			$profile_image = $this->user->mbdsc_reader_profile_image;
-			if ( $profile_image != '' ) {
-				$this->avatar = $profile_image;
-			} else {
 				$this->avatar = get_avatar( $reader_id );
-			}
+
 			$this->bio = $user->description;
 		}
 
@@ -66,10 +62,21 @@ class Mooberry_Story_Community_Reader extends Mooberry_Story_Community_Post_Obje
 		return '';
 	}
 
+	public function is_favorite_author( $author_id ) {
+		$fave_authors = get_user_meta( $this->user_id, '_mbdsc_fave_author' );
+
+		return is_array( $fave_authors ) && in_array( $author_id, $fave_authors );
+	}
+
 	public function is_favorite_story( $story_id ) {
 		$fave_stories = get_user_meta( $this->user_id, '_mbdsc_fave_story' );
 
 		return is_array( $fave_stories ) && in_array( $story_id, $fave_stories );
+	}
+
+	public function add_favorite_author( $author_id ) {
+		$this->remove_favorite_author( $author_id );
+		add_user_meta( $this->user_id, '_mbdsc_fave_author', $author_id );
 	}
 
 	public function add_favorite_story( $story_id ) {
@@ -77,10 +84,21 @@ class Mooberry_Story_Community_Reader extends Mooberry_Story_Community_Post_Obje
 		add_user_meta( $this->user_id, '_mbdsc_fave_story', $story_id );
 	}
 
+	public function remove_favorite_author( $author_id ) {
+		delete_user_meta( $this->user_id, '_mbdsc_fave_author', $author_id );
+	}
+
 	public function remove_favorite_story( $story_id ) {
 		delete_user_meta( $this->user_id, '_mbdsc_fave_story', $story_id );
 	}
 
+	public function toggle_favorite_author( $author_id ) {
+		if ( $this->is_favorite_author( $author_id ) ) {
+			$this->remove_favorite_author( $author_id );
+		} else {
+			$this->add_favorite_author( $author_id );
+		}
+	}
 	public function toggle_favorite_story( $story_id ) {
 		if ( $this->is_favorite_story( $story_id ) ) {
 			$this->remove_favorite_story( $story_id );
@@ -89,14 +107,26 @@ class Mooberry_Story_Community_Reader extends Mooberry_Story_Community_Post_Obje
 		}
 	}
 
+	public function get_favorite_authors() {
+		$fave_authors = get_user_meta( $this->user_id, '_mbdsc_fave_author' );
+		global $mbdsc_author_factory;
+		$authors = array();
+		foreach ( $fave_authors as $fave_author ) {
+			$authors[] = $mbdsc_author_factory->create_author( $fave_author );
+		}
+
+		return $authors;
+	}
+
 	public function get_favorite_stories() {
-		$fave_stories = get_user_meta( $this->user_id, '_mbdsc_fave_story');
+		$fave_stories = get_user_meta( $this->user_id, '_mbdsc_fave_story' );
 		global $mbdsc_story_factory;
 		$stories = array();
-		foreach ( $fave_stories as $fave_story) {
-			$stories[] = $mbdsc_story_factory->create_story( $fave_story);
+		foreach ( $fave_stories as $fave_story ) {
+			$stories[] = $mbdsc_story_factory->create_story( $fave_story );
 		}
-return $stories;
+
+		return $stories;
 	}
 
 	/*protected function get_link() {

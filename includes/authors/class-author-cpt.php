@@ -28,6 +28,9 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 		add_filter( 'the_content', array( $this, 'content' ) );
 		add_filter( 'the_title', array( $this, 'title' ), 10, 2 );
 
+		add_action( 'wp_ajax_mbdsc_toggle_fave_author_status', array( $this, 'toggle_fave_author_status') );
+		add_action( 'wp_ajax_nopriv_mbdsc_toggle_fave_author_status', array( $this, 'toggle_fave_author_status') );
+
 
 	}
 
@@ -143,6 +146,26 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 		}
 
 		return apply_filters( 'mbdsc_author_archive_content', $content );
+	}
+
+	public function toggle_fave_author_status( ) {
+		$nonce = $_POST['security'];
+		if (  ! wp_verify_nonce( $nonce, 'mbdsc_public_ajax_nonce' ) ) {
+			die ();
+		}
+
+		$author_id = isset($_POST['author_id']) ? intval($_POST['author_id']) : 0;
+		$user_id = get_current_user_id();
+
+		if ( $author_id == 0 || $user_id == 0 ) {
+			die();
+		}
+		global $mbdsc_reader_factory;
+
+		$reader = $mbdsc_reader_factory->create_reader($user_id);
+		$reader->toggle_favorite_author($author_id);
+		echo $author_id;
+		wp_die();
 	}
 
 }
