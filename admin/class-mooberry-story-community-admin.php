@@ -62,6 +62,7 @@ class Mooberry_Story_Community_Admin {
 	public function enqueue_styles() {
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/mooberry-story-community-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style('mbdsc-jquery-ui-css', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css');
 
 	}
 
