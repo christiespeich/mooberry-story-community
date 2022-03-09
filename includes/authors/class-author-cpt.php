@@ -27,7 +27,7 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 		$this->set_up_role_levels();
 		add_filter( 'the_content', array( $this, 'content' ) );
 		add_filter( 'the_title', array( $this, 'title' ), 10, 2 );
-		add_filter( 'the_posts', array( $this, 'filter_author_archive'), 10,2 );
+		add_action( 'pre_get_posts', array( $this, 'filter_author_archive') );
 
 
 	}
@@ -149,18 +149,24 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 		return apply_filters( 'mbdsc_author_archive_content', $content );
 	}
 
-	public function filter_author_archive( $posts, $query ) {
+	public function filter_author_archive( $query ) {
 		if ( !is_admin() && $query->is_main_query() ) {
 			if ( $query->is_post_type_archive && $query->query['post_type'] == $this->post_type ) {
-				$posts_to_keep = array();
-				foreach ( $posts as $post ) {
-					if ( count_user_posts($post->post_author, 'mbdsc_story', true) > 0 ) {
-						$posts_to_keep[] = $post;
-					}
-				}
-				return $posts_to_keep;
+				// get authors with at least one story
+				$where = get_posts_by_author_sql('mbdsc_story', true, null, true);
+				global $wpdb;
+				$sql = "select post_author from $wpdb->posts $where group by post_author";
+				$authors = $wpdb->get_col($sql);
+
+				$query->set('author__in', $authors);
 			}
 		}
-		return $posts;
 	}
+
+	private function count_stories_by_author( $userid ) {
+    global $wpdb;
+    $where = get_posts_by_author_sql( 'mbdsc_story', true, $userid, true );
+    $count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where" );
+    return $count;
+}
 }
