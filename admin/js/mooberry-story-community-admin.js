@@ -346,7 +346,7 @@ function mbdsc_chapter_list_update () {
 	jQuery('[id^="mbdbsc_chapter_edit_"]')
 	  .on('click', mbdsc_edit_chapter)
 	jQuery('.mbdsc_chapter_delete_icon')
-	  .on('click', mbdsc_delete_chapter)
+	  .on('click', mbdsc_delete_chapter_click)
 }
 
 
