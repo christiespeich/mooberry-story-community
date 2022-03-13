@@ -28,6 +28,7 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 		add_filter( 'the_content', array( $this, 'content' ) );
 		add_filter( 'the_title', array( $this, 'title' ), 10, 2 );
 		add_action( 'pre_get_posts', array( $this, 'filter_author_archive') );
+		add_filter( 'the_posts', array( $this, 'order_author_archive') );
 
 
 	}
@@ -163,10 +164,17 @@ class Mooberry_Story_Community_Author_CPT  extends Mooberry_Story_Community_CPT 
 		}
 	}
 
-	private function count_stories_by_author( $userid ) {
-    global $wpdb;
-    $where = get_posts_by_author_sql( 'mbdsc_story', true, $userid, true );
-    $count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where" );
-    return $count;
-}
+	public function order_author_archive( $posts ) {
+		global $wp_query;
+		if ( !is_admin() && $wp_query->is_main_query() ) {
+			if ( $wp_query->is_post_type_archive && $wp_query->query['post_type'] == $this->post_type ) {
+				usort( $posts, function ( $a, $b ) {
+					$user_a = new WP_User($a->post_author);
+					$user_b = new WP_User($b->post_author);
+					return strnatcasecmp($user_a->display_name, $user_b->display_name);
+				});
+			}
+		}
+		return $posts;
+	}
 }
